@@ -1,0 +1,108 @@
+/* Reset / Base */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Centrado del card */
+.container.min-vh-100 {
+  min-height: 100vh !important;
+}
+
+/* Card login */
+.login-card {
+  width: 380px;
+  border: 1px solid var(--light);
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(31,47,63,0.08);
+}
+
+/* Logo area */
+.login-card .brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 4px;
+}
+.login-card .brand .logo-frame {
+  width: 84px;
+  height: 84px;
+  border-radius: 12px;
+  background: var(--light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.login-card .brand img {
+  max-width: 72px;
+  max-height: 72px;
+  object-fit: contain;
+  display: block;
+}
+
+/* Título dentro del card */
+.login-card .card-body h5 {
+  margin: 0;
+  color: var(--dark);
+  font-weight: 600;
+}
+
+/* Form fields */
+.form-label { color: var(--muted); font-size: 13px; }
+.form-control {
+  border-radius: 8px;
+  border: 1px solid var(--light);
+  box-shadow: none;
+  height: 44px;
+}
+.form-control:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(62,88,119,0.06);
+}
+
+/* Select */
+.form-select {
+  border-radius: 8px;
+  border: 1px solid var(--light);
+  height: 44px;
+}
+
+/* Botón principal */
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  height: 44px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.btn-primary:hover, .btn-primary:focus {
+  background-color: #354c66;
+  border-color: #354c66;
+  box-shadow: none;
+}
+
+/* Alert container */
+#alertContainer .alert {
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  font-size: 14px;
+}
+
+/* Small helper text */
+.card small.text-muted {
+  color: var(--muted);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .login-card { width: 92%; }
+  .login-card .brand .logo-frame { width: 64px; height: 64px; }
+}

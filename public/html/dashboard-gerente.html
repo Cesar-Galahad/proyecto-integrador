@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard Aseguradora</title>
+  <link rel="stylesheet" href="../css/shared.css">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="brand">
+      <img src="assets/logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
+      <h2>Aseguradora</h2>
+      <small class="role-badge" id="roleBadge"></small>
+    </div>
+
+    <ul>
+      <li><button type="button" onclick="showSection('perfil')">Perfil</button></li>
+      <li><button type="button" onclick="showSection('crear')">Crear</button></li>
+      <li><button type="button" onclick="showSection('leer')">Leer</button></li>
+      <li><button type="button" onclick="showSection('editar')">Editar</button></li>
+      <li><button type="button" onclick="showSection('eliminar')">Eliminar</button></li>
+      <li><button type="button" onclick="logout()" class="danger">Cerrar sesión</button></li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <small id="accountState"></small>
+    </div>
+  </nav>
+
+  <main class="content">
+    <header class="content-header">
+      <h1 id="welcomeTitle">Dashboard</h1>
+      <div class="user-info">
+        <span id="userName"></span>
+      </div>
+    </header>
+
+    <section id="perfil" class="section active">
+      <h3>Perfil</h3>
+      <p id="perfilContent">Cargando...</p>
+    </section>
+
+    <section id="crear" class="section">
+      <h3>Crear</h3>
+      <p>Formulario para crear (placeholder).</p>
+    </section>
+
+    <section id="leer" class="section">
+      <h3>Leer</h3>
+      <p>Listado de registros (placeholder).</p>
+    </section>
+
+    <section id="editar" class="section">
+      <h3>Editar</h3>
+      <p>Formulario para editar (placeholder).</p>
+    </section>
+
+    <section id="eliminar" class="section">
+      <h3>Eliminar</h3>
+      <p>Confirmación para eliminar (cambia estado Activo / Inactivo).</p>
+    </section>
+  </main>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

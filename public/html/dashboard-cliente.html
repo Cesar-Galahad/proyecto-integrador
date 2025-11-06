@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard Cliente — Aseguradora</title>
+  <link rel="stylesheet" href="../css/shared.css">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="brand">
+      <img src="assets/logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
+      <h2>Aseguradora</h2>
+      <small class="role-badge" id="roleBadge"></small>
+    </div>
+
+    <ul>
+      <li><button type="button" onclick="showSection('perfil')">Perfil</button></li>
+      <li><button type="button" onclick="showSection('mis-seguros')">Seguros contratados</button></li>
+      <li><button type="button" onclick="logout()" class="danger">Cerrar sesión</button></li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <small id="accountState"></small>
+    </div>
+  </nav>
+
+  <main class="content">
+    <header class="content-header">
+      <h1 id="welcomeTitle">Panel Cliente</h1>
+      <div class="user-info">
+        <span id="userName"></span>
+      </div>
+    </header>
+
+    <section id="perfil" class="section active">
+      <h3>Perfil</h3>
+      <div id="perfilContent">
+        <p>Cargando información del perfil...</p>
+      </div>
+    </section>
+
+    <section id="mis-seguros" class="section">
+      <h3>Seguros contratados</h3>
+      <div id="segurosList">
+        <p>Cargando pólizas contratadas...</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Página cliente: forzar rol 'cliente' para evitar heurística
+    var PAGE_ROLE = 'cliente';
+
+    // Reutiliza funciones showSection, logout y checkSession definidas en main.js
+    // Si usas el main.js global, asegúrate de cargarlo. Aquí incluimos pequeñas versiones locales
+    function showSection(id) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      var el = document.getElementById(id);
+      if (el) el.classList.add('active');
+    }
+
+    function logout() {
+      localStorage.removeItem('usuarioActivo');
+      localStorage.removeItem('usuarioRole');
+      localStorage.removeItem('usuarioEstado');
+      location.href = 'login.html';
+    }
+
+    function checkSession() {
+      var usuario = localStorage.getItem('usuarioActivo');
+      var role = localStorage.getItem('usuarioRole');
+      var estado = localStorage.getItem('usuarioEstado');
+
+      if (!usuario || !role) {
+        location.href = 'login.html';
+        return;
+      }
+
+      if (estado && estado !== 'Activo') {
+        alert('Tu cuenta está inactiva. Contacta a tu gerente.');
+        logout();
+        return;
+      }
+
+      if (PAGE_ROLE && role !== PAGE_ROLE) {
+        location.href = 'dashboard-' + role + '.html';
+        return;
+      }
+
+      document.getElementById('userName').textContent = usuario;
+      document.getElementById('roleBadge').textContent = role ? role.toUpperCase() : '';
+      document.getElementById('welcomeTitle').textContent = 'Panel Cliente';
+      var accStateEl = document.getElementById('accountState');
+      if (accStateEl) accStateEl.textContent = 'Estado: ' + (estado || 'Activo');
+
+      // Cargar datos del perfil y pólizas desde localStorage (simulación)
+      var perfilContent = document.getElementById('perfilContent');
+      perfilContent.innerHTML = `
+        <p><strong>Usuario:</strong> ${usuario}</p>
+        <p><strong>Rol:</strong> ${role}</p>
+        <p><strong>Estado:</strong> ${estado || 'Activo'}</p>
+      `;
+
+      var segurosList = document.getElementById('segurosList');
+      // Simulación: buscar entradas en localStorage bajo clave 'polizas_<usuario>'
+      var key = 'polizas_' + usuario;
+      var polizas = [];
+      try { polizas = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) { polizas = []; }
+
+      if (!polizas.length) {
+        segurosList.innerHTML = '<p class="text-muted">No tienes pólizas registradas aún.</p>';
+      } else {
+        var html = '<div class="list-group">';
+        polizas.forEach(function(p){
+          html += `<div class="list-group-item">
+            <div class="d-flex w-100 justify-content-between">
+              <h6 class="mb-1">${p.seguroNombre}</h6>
+              <small>${p.estado || 'Activo'}</small>
+            </div>
+            <p class="mb-1">Prima: $${p.prima}</p>
+            <small>Vigencia: ${p.fecha_inicio} — ${p.fecha_fin}</small>
+          </div>`;
+        });
+        html += '</div>';
+        segurosList.innerHTML = html;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', checkSession);
+  </script>
+</body>
+</html>

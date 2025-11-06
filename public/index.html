@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexoSeguros - Seguros para Automóviles</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="#inicio">
+        <img src="./assets/logo2.png" alt="NexoSeguros Logo">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navmenu">
+        <ul class="navbar-nav">
+          <li class="nav-item"><a href="#inicio" class="nav-link">Inicio</a></li>
+          <li class="nav-item"><a href="#servicios" class="nav-link">Servicios</a></li>
+          <li class="nav-item"><a href="#cobertura" class="nav-link">Coberturas</a></li>
+          <li class="nav-item"><a href="#por-que-elegirnos" class="nav-link">¿Por Qué Elegirnos?</a></li>
+          <li class="nav-item"><a href="/public/html/login.html" class="btn btn-primary ms-3">Iniciar Sesion</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <section id="inicio" class="hero-carousel">
+    <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="3"></button>
+      </div>
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <img src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d" class="d-block w-100" alt="Seguro de Auto">
+          <div class="carousel-caption d-none d-md-block">
+            <h2 class="display-5 fw-bold">Seguro de Auto</h2>
+            <p class="lead">Protege tu vehículo con nuestras coberturas completas y precios competitivos.</p>
+            <a href="#cotizar" class="btn btn-primary me-2">Cotizar Ahora</a>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa" class="d-block w-100" alt="Seguro de Hogar">
+          <div class="carousel-caption d-none d-md-block">
+            <h2 class="display-5 fw-bold">Seguro de Hogar</h2>
+            <p class="lead">Tu hogar es tu refugio, protégelo con nuestras pólizas especializadas.</p>
+            <a href="#cotizar" class="btn btn-primary me-2">Cotizar Ahora</a>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <img src="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e" class="d-block w-100" alt="Seguro de Vida">
+          <div class="carousel-caption d-none d-md-block">
+            <h2 class="display-5 fw-bold">Seguro de Vida</h2>
+            <p class="lead">Protege el futuro de tus seres queridos con nuestros planes de vida.</p>
+            <a href="#cotizar" class="btn btn-primary me-2">Cotizar Ahora</a>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f" class="d-block w-100" alt="Seguro de Salud">
+          <div class="carousel-caption d-none d-md-block">
+            <h2 class="display-5 fw-bold">Seguro de Salud</h2>
+            <p class="lead">Tu bienestar es lo primero, cuida de tu salud con nuestras coberturas médicas.</p>
+            <a href="#cotizar" class="btn btn-primary me-2">Cotizar Ahora</a>
+          </div>
+        </div>
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+      </button>
+    </div>
+  </section>
+
+  <section id="servicios" class="py-5 bg-light">
+    <div class="container text-center">
+      <h2 class="text-primary mb-4">Nuestros Servicios</h2>
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-3">
+          <div class="card h-100 shadow-sm border-0 service-card">
+            <img src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d" class="card-img-top" alt="Seguro de Auto" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+              <i class="fas fa-car fa-3x text-primary mb-3"></i>
+              <h5>Seguro de Auto</h5>
+              <p>Protección completa para tu vehículo contra accidentes, robos y daños a terceros. Incluye asistencia en carretera las 24 horas.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="card h-100 shadow-sm border-0 service-card">
+            <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa" class="card-img-top" alt="Seguro de Hogar" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+              <i class="fas fa-home fa-3x text-primary mb-3"></i>
+              <h5>Seguro de Hogar</h5>
+              <p>Protege tu vivienda y pertenencias contra incendios, robos, daños por agua y fenómenos naturales. Incluye responsabilidad civil.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="card h-100 shadow-sm border-0 service-card">
+            <img src="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e" class="card-img-top" alt="Seguro de Vida" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+              <i class="fas fa-heart fa-3x text-primary mb-3"></i>
+              <h5>Seguro de Vida</h5>
+              <p>Garantiza la seguridad económica de tu familia en caso de fallecimiento o incapacidad. Planes flexibles adaptados a tus necesidades.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="card h-100 shadow-sm border-0 service-card">
+            <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f" class="card-img-top" alt="Seguro de Salud" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+              <i class="fas fa-user-md fa-3x text-primary mb-3"></i>
+              <h5>Seguro de Salud</h5>
+              <p>Cobertura médica completa con acceso a una amplia red de hospitales y especialistas. Incluye consultas, estudios y hospitalización.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cobertura" class="py-5" style="background-color: var(--alice-blue);">
+    <div class="container text-center">
+      <h2 class="text-primary mb-4">Nuestros Planes de Cobertura</h2>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="card coverage-card shadow-sm">
+            <div class="card-header py-3">
+              <h5 class="mb-0">Plan Básico</h5>
+            </div>
+            <div class="card-body">
+              <p class="card-text">Ideal para protección esencial</p>
+              <ul class="list-unstyled text-start">
+                <li><i class="fas fa-check-circle text-secondary me-2"></i> Consultas médicas y emergencias básicas.</li>
+                <li><i class="fas fa-check-circle text-secondary me-2"></i> Indemnización por fallecimiento.</li>
+                <li><i class="fas fa-check-circle text-secondary me-2"></i> Protección por incendios y robo parcial.</li>
+                <li><i class="fas fa-times-circle text-muted me-2"></i> Responsabilidad civil y daños a terceros.</li>
+                <li><i class="fas fa-times-circle text-muted me-2"></i> Daños materiales</li>
+              </ul>
+              <div class="mt-4">
+                <span class="h4 text-primary">$299</span><span class="text-muted">/mes</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card coverage-card shadow-sm">
+            <div class="card-header py-3 bg-warning text-dark">
+              <h5 class="mb-0">Plan Premium</h5>
+            </div>
+            <div class="card-body">
+              <p class="card-text">Cobertura amplia y completa</p>
+              <ul class="list-unstyled text-start">
+                <li><i class="fas fa-check-circle text-secondary me-2"></i> Todo lo del Plan Básico</li>
+                <li><i class="fas fa-check-circle text-secondary me-2"></i> Hospitalización, medicamentos y cirugía.</li>
+                <li><i class="fas fa-check-circle text-secondary me-2"></i> Indemnización + ahorro/inversión.</li>
+                <li><i class="fas fa-check-circle text-secondary me-2"></i> Robo total, daños materiales y gastos médicos</li>
+                <li><i class="fas fa-check-circle text-secondary me-2"></i> Responsabilidad civil</li>
+              </ul>
+              <div class="mt-4">
+                <span class="h4 text-primary">$599</span><span class="text-muted">/mes</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card coverage-card shadow-sm">
+            <div class="card-header py-3 bg-primary text-white">
+              <h5 class="mb-0">Plan Personalizado</h5>
+            </div>
+            <div class="card-body">
+              <p class="card-text">Diseñado específicamente para ti</p>
+              <ul class="list-unstyled text-start">
+                <li><i class="fas fa-check-circle text-secondary me-2"></i> Todo lo del Plan Premium</li>
+                <li><i class="fas fa-check-circle text-secondary me-2"></i> Cobertura internacional y asistencia VIP.</li>
+                <li><i class="fas fa-check-circle text-secondary me-2"></i> Beneficios personalizados y doble indemnización.</li>
+                <li><i class="fas fa-check-circle text-secondary me-2"></i> Protección internacional y reembolso por pérdida.</li>
+                <li><i class="fas fa-check-circle text-secondary me-2"></i> Conductor designado y asistencia premium.</li>
+              </ul>
+              <div class="mt-4">
+                <span class="h4 text-primary">Consultar</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="por-que-elegirnos" class="py-5 bg-white">
+    <div class="container text-center">
+      <h2 class="text-primary mb-4">¿Por Qué Elegirnos?</h2>
+      <div class="row g-4">
+        <div class="col-md-3">
+          <i class="fas fa-award fa-2x text-primary mb-2"></i>
+          <h5>Experiencia</h5>
+          <p>Más de una década de trayectoria.</p>
+        </div>
+        <div class="col-md-3">
+          <i class="fas fa-headset fa-2x text-primary mb-2"></i>
+          <h5>Atención 24/7</h5>
+          <p>Siempre disponibles para ti.</p>
+        </div>
+        <div class="col-md-3">
+          <i class="fas fa-hand-holding-usd fa-2x text-primary mb-2"></i>
+          <h5>Precios Justos</h5>
+          <p>Planes adaptados a tus necesidades.</p>
+        </div>
+        <div class="col-md-3">
+          <i class="fas fa-file-contract fa-2x text-primary mb-2"></i>
+          <h5>Procesos Ágiles</h5>
+          <p>Gestión rápida y sin complicaciones.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cotizar" class="py-5 text-white text-center" style="background-color: var(--gunmetal);">
+    <div class="container">
+      <h2 class="mb-3">Cotiza Tu Seguro Ahora</h2>
+      <p class="mb-4">Completa el formulario y recibe tu cotización personalizada</p>
+      <form class="row g-3 justify-content-center text-start bg-white text-dark p-4 rounded shadow" style="max-width: 600px; margin:auto;">
+        <div class="col-md-6">
+          <label for="tipo-seguro" class="form-label">Tipo de Seguro</label>
+          <select class="form-select" id="tipo-seguro" required>
+            <option value="">Selecciona</option>
+            <option>Auto</option>
+            <option>Hogar</option>
+            <option>Vida</option>
+            <option>Salud</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label for="marca" class="form-label">Marca/Modelo</label>
+          <input type="text" class="form-control" id="marca" placeholder="Toyota, Honda...">
+        </div>
+        <div class="col-md-6">
+          <label for="ano" class="form-label">Año</label>
+          <input type="number" class="form-control" id="ano" min="1990" max="2025">
+        </div>
+        <div class="col-md-6">
+          <label for="cobertura" class="form-label">Tipo de Cobertura</label>
+          <select class="form-select" id="cobertura" required>
+            <option value="">Selecciona</option>
+            <option>Básica</option>
+            <option>Amplia</option>
+            <option>Completa</option>
+          </select>
+        </div>
+        <div class="col-12">
+          <label for="email" class="form-label">Correo</label>
+          <input type="email" class="form-control" id="email" required>
+        </div>
+        <div class="col-12 text-center">
+          <button class="btn btn-primary w-100" type="submit">Solicitar Cotización</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="py-4 text-white text-center" style="background-color: var(--gunmetal);">
+    <div class="container">
+      <p class="mb-1">&copy; 2025 NexoSeguros. Todos los derechos reservados.</p>
+      <div>
+        <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
+        <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>
