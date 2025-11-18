@@ -1,0 +1,205 @@
+/* Reset básico */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  display: flex;
+  min-height: 100vh;
+  background: #f4f6f8;
+  color: #222;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 280px;
+  background: #13376A; /* azul a gris */
+  color: white;
+  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: width 0.18s ease;
+}
+
+/* Logo y marca */
+.sidebar .brand {
+  text-align: left;
+  margin-bottom: 8px;
+}
+.sidebar .logo {
+  height: 60px;
+  margin-bottom: 8px;
+}
+.sidebar .divider {
+  border: 5;
+  border-top: 1px solid rgba(255,255,255,0.3);
+  margin: 10px 0;
+}
+
+/* Lista de botones */
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0 0;
+}
+.sidebar ul li {
+  margin-bottom: 10px;
+}
+
+/* Botones */
+.sidebar button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  background: transparent;
+  color: #fff;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: background 0.12s ease, transform 0.06s;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* Icono contenedor */
+.sidebar button .icon {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.10);
+  flex-shrink: 0;
+}
+
+/* Imagen del icono */
+.sidebar button .icon-img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+/* Hover */
+.sidebar button:hover {
+  background: rgba(255,255,255,0.06);
+  transform: translateY(-1px);
+}
+
+/* Activo */
+.sidebar button.active {
+  background: rgba(255,255,255,0.10);
+  border-left: 4px solid rgba(255,255,255,0.92);
+  padding-left: 10px;
+}
+
+/* Botón peligro */
+.sidebar button.danger {
+  background: rgba(255,255,255,0.04);
+  color: #fff;
+  margin-top: 14px;
+}
+.sidebar button.danger:hover {
+  background: rgba(255,255,255,0.12);
+}
+
+.sidebar-toggle {
+  position: relative;
+  z-index: 200; /* mayor que el sidebar */
+}
+
+/* Pie del sidebar */
+.sidebar-footer {
+  font-size: 13px;
+  color: rgba(255,255,255,0.88);
+  margin-top: 12px;
+}
+
+/* Contenido */
+.content {
+  flex-grow: 1;
+  padding: 24px;
+  overflow: auto;
+}
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.content-header h1 {
+  margin: 0;
+  color: #1f2f3f;
+  font-size: 20px;
+}
+.user-info {
+  color: #6c757d;
+  font-size: 14px;
+}
+
+/* Secciones */
+.section {
+  display: none;
+  background: white;
+  padding: 18px;
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(31,47,63,0.06);
+}
+.section.active {
+  display: block;
+}
+
+@media (min-width: 901px) {
+  .sidebar-toggle {
+    display: none;
+  }
+}
+
+/* Responsive */
+/* Responsive: colapsa sidebar en móvil */
+@media (max-width: 900px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    z-index: 100;
+    width: 260px;
+    padding: 20px;
+    transition: transform 0.2s ease;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: 0 8px 36px rgba(0,0,0,0.3);
+    padding-top: 60px; /* espacio para que el toggle no se encime */
+  }
+
+
+  .sidebar-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: #2b6cb0;
+    color: #fff;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  .content {
+    padding: 16px;
+    margin-left: 0;
+  }
+}
