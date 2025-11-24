@@ -1,47 +1,23 @@
 <?php
-// Usuario.php
+// Ruta: app/models/Usuario.php
 require_once __DIR__ . '/../Core/DB.php';
 
 class Usuario {
     private $pdo;
 
     public function __construct() {
-        $this->pdo = DB::connect(); // igual que Agente y Gerente
-    }
-
-    public function crearAgenteUsuario($usuario, $passwordHash, $idAgente) {
-        $stmt = $this->pdo->prepare(
-            "INSERT INTO usuarios (nusuario, contrasena, rol, id_agente, estatus)
-             VALUES (:usuario, :contrasena, 'agente', :idAgente, 'Activo')"
-        );
-        return $stmt->execute([
-            ':usuario'    => $usuario,
-            ':contrasena' => $passwordHash,
-            ':idAgente'   => $idAgente
-        ]);
+        $this->pdo = DB::connect();
     }
 
     public function buscarPorUsuario($usuario) {
-        $stmt = $this->pdo->prepare("SELECT * FROM usuarios WHERE nusuario = :usuario");
+        $stmt = $this->pdo->prepare("SELECT * FROM usuarios WHERE usuario = :usuario");
         $stmt->execute([':usuario' => $usuario]);
-        return $stmt->fetch();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-public function crear($data) {
-    $stmt = $this->pdo->prepare("INSERT INTO usuarios (
-        nusuario, contrasena, rol, id_cliente, estatus
-    ) VALUES (
-        :usuario, :password, :rol, :id_cliente, 'Activo'
-    )");
 
-    $stmt->execute([
-        ':usuario' => $data['usuario'],
-        ':password' => $data['password'],
-        ':rol' => $data['rol'],
-        ':id_cliente' => $data['id_cliente']
-    ]);
-
-    return $this->pdo->lastInsertId();
+    public function actualizarCambioContraseña($idUsuario, $nuevaPassword) {
+        $stmt = $this->pdo->prepare("UPDATE usuarios SET contrasena = :contrasena, primer_login = 0 WHERE id_usuario = :id");
+        return $stmt->execute([':contrasena' => $nuevaPassword, ':id' => $idUsuario]);
+    }
 }
 
-
-}

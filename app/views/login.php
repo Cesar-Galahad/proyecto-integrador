@@ -10,13 +10,10 @@ unset($_SESSION['login_error']);
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Login — Aseguradora</title>
-
-  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- Estilos propios -->
   <link rel="stylesheet" href="../../public/css/shared.css">
   <link rel="stylesheet" href="../../public/css/login.css?v=1">
+
 </head>
 <body class="bg-light login-page">
 
@@ -30,7 +27,7 @@ unset($_SESSION['login_error']);
     </div>
 
     <!-- Card -->
-    <div class="card shadow-sm login-card" style="max-width: 380px; width: 100%;">
+    <div class="card shadow-sm login-card" style="max-width: 360px; width: 100%;">
       <div class="card-body p-4">
         <div class="text-center">
           <h5 class="mt-1 text-muted">Bienvenido</h5>
@@ -81,27 +78,6 @@ unset($_SESSION['login_error']);
     </div>
   </div>
 
-  <script>
-    // Mostrar/ocultar contraseña
-    document.getElementById('togglePassword').addEventListener('click', function () {
-      const pwd = document.getElementById('password');
-      pwd.type = pwd.type === 'password' ? 'text' : 'password';
-    });
-
-    // Validación Bootstrap
-    (function () {
-      'use strict';
-      const forms = document.querySelectorAll('.needs-validation');
-      Array.from(forms).forEach(function (form) {
-        form.addEventListener('submit', function (event) {
-          if (!form.checkValidity()) {
-            event.preventDefault();
-            event.stopPropagation();
-          }
-          form.classList.add('was-validated');
-        }, false);
-      });
-    })();
-  </script>
+  <script src="../../public/js/login.js"></script>
 </body>
 </html>

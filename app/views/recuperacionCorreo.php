@@ -1,0 +1,77 @@
+<?php
+
+?>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Recuperación de contraseña — Aseguradora</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Estilos propios -->
+  <link rel="stylesheet" href="../../public/css/shared.css">
+  <link rel="stylesheet" href="../../public/css/login.css?v=3">
+</head>
+<body class="bg-light login-page">
+
+  <div class="container d-flex align-items-center justify-content-center min-vh-100 flex-column">
+
+    <!-- Logo -->
+    <div class="text-center mb-2">
+      <a href="../../index.php">
+        <img src="../../public/assets/logo2.png" alt="Logo" class="logo" onerror="this.style.display='none'">
+      </a>
+    </div>
+
+    <!-- Card -->
+    <div class="card shadow-sm login-card" style="max-width: 380px; width: 100%;">
+      <div class="card-body p-4">
+        <div class="text-center">
+          <h5 class="mt-1 text-muted">Bienvenido</h5>
+          <h5 class="form-label">Ingresa tu correo para recuperar contraseña</h5>
+        </div>
+        
+        
+
+        <!-- Formulario -->
+        <form id="recoverForm" class="needs-validation" method="post" action="../../public/recuperacionCorreo.php" novalidate>
+          
+          <!-- Correo -->
+          <div class="mb-3">
+            <label class="form-label" for="email">Correo electrónico</label>
+            <div class="input-group">
+              <span class="input-group-text">
+                <img src="../../public/assets/usuario.png" alt="Correo" class="icon-input">
+              </span>
+              <input name="email" type="email" class="form-control" id="email" required>
+              <div class="invalid-feedback">Ingresa un correo válido.</div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">Recuperar contraseña</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Validación Bootstrap
+    (function () {
+      'use strict';
+      const forms = document.querySelectorAll('.needs-validation');
+      Array.from(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add('was-validated');
+        }, false);
+      });
+    })();
+  </script>
+</body>
+</html>
