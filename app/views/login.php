@@ -73,7 +73,7 @@ unset($_SESSION['login_error']);
         </form>
 
         <hr class="my-3">
-        <a class="recuperacion d-block text-center text-decoration-none mt-2" href="recuperar.php">¿Olvidaste tu contraseña?</a>
+        <a class="recuperacion d-block text-center text-decoration-none mt-2" href="recuperacionCorreo.php">¿Olvidaste tu contraseña?</a>
       </div>
     </div>
   </div>

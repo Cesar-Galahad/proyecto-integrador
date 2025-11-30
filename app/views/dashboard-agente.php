@@ -14,11 +14,16 @@
   $robo     = $controller->listarClientesRoboActivos($idAgente);
   $incendio = $controller->listarClientesIncendioActivos($idAgente);
 
+  $solicitudesVendidas = $controller->listarSolicitudesVendidas($idAgente);
+
   // Ordenamiento si viene POST
-  $tabla = $_POST['tabla'] ?? null;
-  $campoOrden = $_POST['ordenar_por'] ?? null;
+  $tabla       = $_POST['tabla'] ?? null;
+  $campoOrden  = $_POST['ordenar_por'] ?? null;
+  $direccion   = $_POST['direccion'] ?? 'asc';   // nuevo campo del formulario
+  $ascendente  = ($direccion === 'asc');         // true si ascendente, false si descendente
+
   if ($tabla && $campoOrden) {
-      $controller->ordenarClientes($tabla, $campoOrden, $vida, $auto, $robo, $incendio);
+      $controller->ordenarClientes($tabla, $campoOrden, $vida, $auto, $robo, $incendio, $ascendente);
   }
 
   $activeSection = $_SESSION['active_section'] ?? 'perfil';
@@ -34,8 +39,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Dashboard Agente — Aseguradora</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/prueba/proyecto-integrador/public/css/shared.css">
-  <link rel="stylesheet" href="/prueba/proyecto-integrador/public/css/dashboard.css">
+  <link rel="stylesheet" href="../../public/css/shared.css">
+  <link rel="stylesheet" href="../../public/css/dashboard.css">
 </head>
 <body>
   <nav class="sidebar">
@@ -67,6 +72,14 @@
             <img src="../../public/assets/leer.png" alt="Leer" class="icon-img">
           </span>
           Leer
+        </button>
+      </li>
+      <li>
+        <button type="button" onclick="showSection('buscar')">
+          <span class="icon">
+            <img src="../../public/assets/lupa.png" alt="buscar" class="icon-img">
+          </span>
+          Buscar
         </button>
       </li>
       <li>
@@ -102,10 +115,9 @@
 
   <main class="content">
     <header class="content-header">
+      <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
       <h1>Panel Agente</h1>
-      <div class="user-info">
-        <span><?= htmlspecialchars($usuario) ?></span>
-      </div>
+      <div class="user-info"><span><?= htmlspecialchars($usuario) ?></span></div>
     </header>
 
     <section id="perfil" class="section <?php echo $activeSection === 'perfil' ? 'active' : ''; ?>">
@@ -155,49 +167,51 @@
             </div>
           </div>
         </div>
-        <div class="mt-4">
-  <button class="btn btn-primary" onclick="mostrarTabla()">Solicitudes Vendidas</button>
-  </div>
+            <div class="mt-4">
+      <button class="btn btn-primary" onclick="mostrarTabla()">Solicitudes Vendidas</button>
+        </div>
 
-  <div id="tablaSeguros" style="display:none;" class="mt-4">
-    <h4>Solicitudes Vendidas</h4>
-    <table id="tablaSolicitudes" class="table table-hover table-bordered">
-      <thead class="table-dark">
-        <tr>
-          <th>ID Solicitud</th>
-          <th>Cliente</th>
-          <th>Cantidad</th>
-          <th>Fecha</th>
-          <th>% Comisión</th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php if (!empty($solicitudesVendidas)): ?>
-        <?php foreach ($solicitudesVendidas as $s): ?>
-          <tr>
-            <td><?= htmlspecialchars($s['id_solicitud']) ?></td>
-            <td><?= htmlspecialchars($s['cliente']) ?></td>
-            <td><?= htmlspecialchars($s['cantidad']) ?></td>
-            <td><?= htmlspecialchars($s['fecha']) ?></td>
-            <td><?= htmlspecialchars($s['porcentaje']) ?></td>
-          </tr>
-        <?php endforeach; ?>
-      <?php else: ?>
-        <tr>
-          <td colspan="5" class="text-center text-muted">No hay solicitudes activas vendidas.</td>
-        </tr>
-      <?php endif; ?>
+        <div id="tablaSeguros" style="display:none;" class="mt-4">
+          <h4>Solicitudes Vendidas</h4>
+          <table id="tablaSolicitudes" class="table table-hover table-bordered">
+            <thead class="table-dark">
+              <tr>
+                <th>ID Solicitud</th>
+                <th>Cliente</th>
+                <th>Cantidad</th>
+                <th>Tipo de Seguro</th>
+                <th>Fecha</th>
+                <th>% Comisión</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php if (!empty($solicitudesVendidas)): ?>
+                <?php foreach ($solicitudesVendidas as $s): ?>
+                  <tr>
+                    <td><?= htmlspecialchars($s['id_solicitud']) ?></td>
+                    <td><?= htmlspecialchars($s['cliente']) ?></td>
+                    <td><?= htmlspecialchars($s['tipo_seguro']) ?></td>
+                    <td><?= htmlspecialchars($s['cantidad']) ?></td>
+                    <td><?= htmlspecialchars($s['fecha']) ?></td>
+                    <td><?= htmlspecialchars($s['porcentaje']) ?></td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <tr>
+                  <td colspan="5" class="text-center text-muted">No hay solicitudes activas vendidas.</td>
+                </tr>
+              <?php endif; ?>
+            </tbody>
+          </table>
 
-      </tbody>
-    </table>
-
-    <button class="btn btn-success mt-3" onclick="calcularTotalRecursivo()">Calcular Comisión</button>
-    <p id="resultado" class="mt-2 fw-bold text-success"></p>
-  </div>
+          <button class="btn btn-success mt-3" onclick="calcularTotalRecursivo()">Calcular Comisión</button>
+          <p id="resultado" class="mt-2 fw-bold text-success"></p>
+        </div>
       <?php else: ?>
         <p class="text-muted">No se encontró información del agente.</p>
       <?php endif; ?>
     </section>
+
 
   <section id="crear" class="section <?php echo $activeSection === 'crear' ? 'active' : ''; ?>">
   <h3>Crear nueva póliza</h3>
@@ -309,6 +323,11 @@
         <option value="curp">CURP</option>
         <option value="fecha_solicitud">Fecha Solicitud</option>
       </select>
+      <select name="direccion" class="form-select w-auto">
+        <option value="asc">Ascendente</option>
+        <option value="desc">Descendente</option>
+      </select>
+
       <button type="submit" class="btn btn-primary btn-sm">Ordenar</button>
     </form>
 
@@ -364,6 +383,11 @@
         <option value="curp">CURP</option>
         <option value="fecha_solicitud">Fecha Solicitud</option>
       </select>
+      <select name="direccion" class="form-select w-auto">
+        <option value="asc">Ascendente</option>
+        <option value="desc">Descendente</option>
+      </select>
+
       <button type="submit" class="btn btn-primary btn-sm">Ordenar</button>
     </form>
 
@@ -422,6 +446,11 @@
         <option value="curp">CURP</option>
         <option value="fecha_solicitud">Fecha Solicitud</option>
       </select>
+      <select name="direccion" class="form-select w-auto">
+        <option value="asc">Ascendente</option>
+        <option value="desc">Descendente</option>
+      </select>
+
       <button type="submit" class="btn btn-primary btn-sm">Ordenar</button>
     </form>
 
@@ -478,6 +507,11 @@
         <option value="curp">CURP</option>
         <option value="fecha_solicitud">Fecha Solicitud</option>
       </select>
+      <select name="direccion" class="form-select w-auto">
+        <option value="asc">Ascendente</option>
+        <option value="desc">Descendente</option>
+      </select>
+
       <button type="submit" class="btn btn-primary btn-sm">Ordenar</button>
     </form>
 
@@ -527,230 +561,474 @@
         </tbody>
       </table>
     </div>        
+ </section>
 
-    </section>
+  <section id="buscar" class="section <?php echo $activeSection === 'buscar' ? 'active' : ''; ?>">
+            <div id="mensajeError" class="alert alert-danger" style="display:none;"></div>
+    <h3>Buscar Cliente</h3>
+    <!-- Formulario de búsqueda -->
+    <form id="formBuscar" method="post" action="../controllers/BusquedaController.php" class="mb-3">
+      <div class="mb-3">
+        <input type="text" name="criterio" id="criterio" class="form-control" placeholder="Nombre o CURP">
+        <!-- Mensaje de error -->
+        <div id="feedbackInput" class="invalid-feedback"></div>
+      </div>
+      <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
+    <!-- Tabla de resultados -->
+    <div class="mt-3 table-responsive">
+      <table id="tablaResultado" class="table table-striped table-hover table-bordered align-middle" style="display:none;">
+        <thead class="table-dark">
+          <tr>
+            <th>ID Cliente</th>
+            <th>Nombre</th>
+            <th>CURP</th>
+            <th>RFC</th>
+            <th>Teléfono</th>
+            <th>Correo</th>
+            <th>Seguros</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+
 
     <section id="actualizar" class="section <?php echo $activeSection === 'actualizar' ? 'active' : ''; ?>">
-      <h3>Actualizar Clientes — Seguro de Vida</h3>
-      <?php $vida = $controller->listarClientesVidaActivos($idAgente); ?>
+<h3>Actualizar Clientes — Seguro de Vida</h3>
+<?php $vida = $controller->listarClientesVidaActivos($idAgente); ?>
+<div class="table-responsive">
+  <table class="table table-hover table-bordered align-middle" data-tipo="vida">
+    <thead class="table-dark">
+      <tr>
+        <th>Nombre</th><th>Apellido Paterno</th><th>Apellido Materno</th>
+        <th>CURP</th><th>RFC</th><th>Teléfono</th>
+        <th>Usuario</th><th>Correo</th>
+        <th>Edad</th><th>Enfermedades</th><th>Folio Vida</th>
+        <th>Valor Asegurado</th><th>% Comisión</th>
+        <th>Fecha Solicitud</th>
+        <th>Sucursal</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php foreach ($vida as $v): ?>
+        <tr>
+          <form action="../controllers/ActualizarAController.php" method="post">
+            <input type="hidden" name="tipo" value="vida">
+            <input type="hidden" name="id" value="<?= $v['id_cliente'] ?>">
+
+            <td><input type="text" class="form-control" name="nombre" value="<?= htmlspecialchars($v['nombre']) ?>" disabled></td>
+            <td><input type="text" class="form-control" name="apellidoPaterno" value="<?= htmlspecialchars($v['apellidoPaterno']) ?>" disabled></td>
+            <td><input type="text" class="form-control" name="apellidoMaterno" value="<?= htmlspecialchars($v['apellidoMaterno']) ?>" disabled></td>
+            <td><input type="text" class="form-control" name="curp" value="<?= htmlspecialchars($v['curp']) ?>" disabled></td>
+            <td><input type="text" class="form-control" name="rfc" value="<?= htmlspecialchars($v['rfc']) ?>" disabled></td>
+            <td><input type="text" class="form-control" name="telefono" value="<?= htmlspecialchars($v['telefono']) ?>" disabled></td>
+
+            <td><input type="text" class="form-control" name="usuario" value="<?= htmlspecialchars($v['usuario']) ?>" disabled></td>
+            <td><input type="email" class="form-control" name="correo" value="<?= htmlspecialchars($v['correo']) ?>" disabled></td>
+
+            <td><input type="number" class="form-control" name="edad" value="<?= htmlspecialchars($v['edad']) ?>" disabled></td>
+            <td><input type="text" class="form-control" name="enfermedades_preexistentes" value="<?= htmlspecialchars($v['enfermedades_preexistentes']) ?>" disabled></td>
+            <td><input type="text" class="form-control" name="folio_vida" value="<?= htmlspecialchars($v['folio_vida']) ?>" disabled></td>
+            <td><input type="number" class="form-control" step="0.01" name="valor_asegurado" value="<?= htmlspecialchars($v['valor_asegurado']) ?>" disabled></td>
+            <td><input type="number" class="form-control" step="0.01" name="porcentaje_comision" value="<?= htmlspecialchars($v['porcentaje_comision']) ?>" disabled></td>
+            <td><input type="date" class="form-control" name="fecha_solicitud" value="<?= htmlspecialchars($v['fecha_solicitud']) ?>" disabled></td>
+
+            <td><input type="text" class="form-control" name="codigoSucursal" value="<?= htmlspecialchars($v['codigoSucursal']) ?>" readonly></td>
+
+            <td>
+              <div class="d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-primary editar">Editar</button>
+                <button type="submit" class="btn btn-sm btn-success actualizar" disabled>Actualizar</button>
+              </div>
+            </td>
+          </form>
+        </tr>
+      <?php endforeach; ?>
+    </tbody>
+  </table>
+</div>
+
+
+    <h3>Actualizar Clientes — Seguro de Auto</h3>
+    <?php $auto = $controller->listarClientesAutoActivos($idAgente); ?>
+    <div class="table-responsive">
+      <table class="table table-hover table-bordered align-middle" data-tipo="auto">
+        <thead class="table-dark">
+          <tr>
+            <th>Nombre</th><th>Apellido Paterno</th><th>Apellido Materno</th>
+            <th>CURP</th><th>RFC</th><th>Teléfono</th>
+            <th>Usuario</th><th>Correo</th>
+            <th>Matrícula</th><th>Modelo</th><th>Año</th>
+            <th>Valor Factura</th><th>% Comisión</th>
+            <th>Fecha Solicitud</th>
+            <th>Sucursal</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($auto as $au): ?>
+            <tr>
+              <form action="../controllers/ActualizarAController.php" method="post">
+                <input type="hidden" name="tipo" value="auto">
+                <input type="hidden" name="id" value="<?= $au['id_cliente'] ?>">
+
+                <td><input type="text" class="form-control" name="nombre" value="<?= htmlspecialchars($au['nombre']) ?>" disabled></td>
+                <td><input type="text" class="form-control" name="apellidoPaterno" value="<?= htmlspecialchars($au['apellidoPaterno']) ?>" disabled></td>
+                <td><input type="text" class="form-control" name="apellidoMaterno" value="<?= htmlspecialchars($au['apellidoMaterno']) ?>" disabled></td>
+                <td><input type="text" class="form-control" name="curp" value="<?= htmlspecialchars($au['curp']) ?>" disabled></td>
+                <td><input type="text" class="form-control" name="rfc" value="<?= htmlspecialchars($au['rfc']) ?>" disabled></td>
+                <td><input type="text" class="form-control" name="telefono" value="<?= htmlspecialchars($au['telefono']) ?>" disabled></td>
+
+                <td><input type="text" class="form-control" name="usuario" value="<?= htmlspecialchars($au['usuario']) ?>" disabled></td>
+                <td><input type="email" class="form-control" name="correo" value="<?= htmlspecialchars($au['correo']) ?>" disabled></td>
+
+                <td><input type="text" class="form-control" name="matricula" value="<?= htmlspecialchars($au['matricula']) ?>" disabled></td>
+                <td><input type="text" class="form-control" name="modelo" value="<?= htmlspecialchars($au['modelo']) ?>" disabled></td>
+                <td><input type="number" class="form-control" name="anio" value="<?= htmlspecialchars($au['anio']) ?>" disabled></td>
+                <td><input type="number" class="form-control" step="0.01" name="valor_factura" value="<?= htmlspecialchars($au['valor_factura']) ?>" disabled></td>
+                <td><input type="number" class="form-control" step="0.01" name="porcentaje_comision" value="<?= htmlspecialchars($au['porcentaje_comision']) ?>" disabled></td>
+                <td><input type="date" class="form-control" name="fecha_solicitud" value="<?= htmlspecialchars($au['fecha_solicitud']) ?>" disabled></td>
+
+                <!-- Sucursal: readonly para que se envíe pero no se edite -->
+                <td><input type="text" class="form-control" name="codigoSucursal" value="<?= htmlspecialchars($au['codigoSucursal']) ?>" readonly></td>
+
+                <td>
+                  <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-primary editar">Editar</button>
+                    <button type="submit" class="btn btn-sm btn-success actualizar" disabled>Actualizar</button>
+                  </div>
+                </td>
+              </form>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
+    <h3>Actualizar Clientes — Seguro de Robo</h3>
+    <?php $robo = $controller->listarClientesRoboActivos($idAgente); ?>
+    <div class="table-responsive">
+      <table class="table table-hover table-bordered align-middle" data-tipo="robo">
+        <thead class="table-dark">
+          <tr>
+            <th>Nombre</th><th>Apellido Paterno</th><th>Apellido Materno</th>
+            <th>CURP</th><th>RFC</th><th>Teléfono</th>
+            <th>Usuario</th><th>Correo</th>
+            <th>Objeto</th><th>Medidas Seguridad</th>
+            <th>Valor Artículo</th><th>% Comisión</th>
+            <th>Fecha Solicitud</th>
+            <th>Sucursal</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($robo as $r): ?>
+            <tr>
+              <form action="../controllers/ActualizarAController.php" method="post">
+                <input type="hidden" name="tipo" value="robo">
+                <input type="hidden" name="id" value="<?= htmlspecialchars($r['id_cliente']) ?>">
+
+                <td><input type="text" class="form-control" name="nombre" value="<?= htmlspecialchars($r['nombre']) ?>" disabled></td>
+                <td><input type="text" class="form-control" name="apellidoPaterno" value="<?= htmlspecialchars($r['apellidoPaterno']) ?>" disabled></td>
+                <td><input type="text" class="form-control" name="apellidoMaterno" value="<?= htmlspecialchars($r['apellidoMaterno']) ?>" disabled></td>
+                <td><input type="text" class="form-control" name="curp" value="<?= htmlspecialchars($r['curp']) ?>" disabled></td>
+                <td><input type="text" class="form-control" name="rfc" value="<?= htmlspecialchars($r['rfc']) ?>" disabled></td>
+                <td><input type="text" class="form-control" name="telefono" value="<?= htmlspecialchars($r['telefono']) ?>" disabled></td>
+
+                <td><input type="text" class="form-control" name="usuario" value="<?= htmlspecialchars($r['usuario']) ?>" disabled></td>
+                <td><input type="email" class="form-control" name="correo" value="<?= htmlspecialchars($r['correo']) ?>" disabled></td>
+
+                <td><input type="text" class="form-control" name="tipo_objeto" value="<?= htmlspecialchars($r['tipo_objeto']) ?>" disabled></td>
+                <td><input type="text" class="form-control" name="medidas_seguridad" value="<?= htmlspecialchars($r['medidas_seguridad']) ?>" disabled></td>
+                <td><input type="number" step="0.01" class="form-control" name="valor_articulo" value="<?= htmlspecialchars($r['valor_articulo']) ?>" disabled></td>
+                <td><input type="number" step="0.01" class="form-control" name="porcentaje_comision" value="<?= htmlspecialchars($r['porcentaje_comision']) ?>" disabled></td>
+                <td><input type="date" class="form-control" name="fecha_solicitud" value="<?= htmlspecialchars($r['fecha_solicitud']) ?>" disabled></td>
+
+                <!-- Sucursal: readonly para que se envíe pero no se edite -->
+                <td><input type="text" class="form-control" name="codigoSucursal" value="<?= htmlspecialchars($r['codigoSucursal']) ?>" readonly></td>
+
+                <td>
+                  <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-primary editar">Editar</button>
+                    <button type="submit" class="btn btn-sm btn-success actualizar" disabled>Actualizar</button>
+                  </div>
+                </td>
+              </form>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
+    <h3>Actualizar Clientes — Seguro de Incendio</h3>
+    <?php $incendio = $controller->listarClientesIncendioActivos($idAgente); ?>
+    <div class="table-responsive">
+      <table class="table table-hover table-bordered align-middle" data-tipo="incendio">
+        <thead class="table-dark">
+          <tr>
+            <th>Nombre</th><th>Apellido Paterno</th><th>Apellido Materno</th>
+            <th>CURP</th><th>RFC</th><th>Teléfono</th>
+            <th>Usuario</th><th>Correo</th>
+            <th>Valor Vivienda</th><th>Antigüedad</th>
+            <th>Nivel</th><th>Causa Probable</th><th>Tipo Construcción</th>
+            <th>% Comisión</th>
+            <th>Fecha Solicitud</th>
+            <th>Sucursal</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($incendio as $i): ?>
+            <tr>
+              <form action="../controllers/ActualizarAController.php" method="post">
+                <input type="hidden" name="tipo" value="incendio">
+                <input type="hidden" name="id" value="<?= htmlspecialchars($i['id_cliente']) ?>">
+
+                <td><input type="text" class="form-control" name="nombre" value="<?= htmlspecialchars($i['nombre']) ?>" disabled></td>
+                <td><input type="text" class="form-control" name="apellidoPaterno" value="<?= htmlspecialchars($i['apellidoPaterno']) ?>" disabled></td>
+                <td><input type="text" class="form-control" name="apellidoMaterno" value="<?= htmlspecialchars($i['apellidoMaterno']) ?>" disabled></td>
+                <td><input type="text" class="form-control" name="curp" value="<?= htmlspecialchars($i['curp']) ?>" disabled></td>
+                <td><input type="text" class="form-control" name="rfc" value="<?= htmlspecialchars($i['rfc']) ?>" disabled></td>
+                <td><input type="text" class="form-control" name="telefono" value="<?= htmlspecialchars($i['telefono']) ?>" disabled></td>
+
+                <td><input type="text" class="form-control" name="usuario" value="<?= htmlspecialchars($i['usuario']) ?>" disabled></td>
+                <td><input type="email" class="form-control" name="correo" value="<?= htmlspecialchars($i['correo']) ?>" disabled></td>
+
+                <td><input type="number" class="form-control" name="valor_vivienda" value="<?= htmlspecialchars($i['valor_vivienda']) ?>" disabled></td>
+                <td><input type="number" class="form-control" name="antiguedad" value="<?= htmlspecialchars($i['antiguedad']) ?>" disabled></td>
+                <td><input type="text" class="form-control" name="nivel_incendio" value="<?= htmlspecialchars($i['nivel_incendio']) ?>" disabled></td>
+                <td><input type="text" class="form-control" name="causa_probable" value="<?= htmlspecialchars($i['causa_probable']) ?>" disabled></td>
+                <td><input type="text" class="form-control" name="tipo_construccion" value="<?= htmlspecialchars($i['tipo_construccion']) ?>" disabled></td>
+                <td><input type="number" step="0.01" class="form-control" name="porcentaje_comision" value="<?= htmlspecialchars($i['porcentaje_comision']) ?>" disabled></td>
+                <td><input type="date" class="form-control" name="fecha_solicitud" value="<?= htmlspecialchars($i['fecha_solicitud']) ?>" disabled></td>
+
+                <!-- Sucursal: readonly para que se envíe pero no se edite -->
+                <td><input type="text" class="form-control" name="codigoSucursal" value="<?= htmlspecialchars($i['codigoSucursal']) ?>" readonly></td>
+
+                <td>
+                  <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-primary editar">Editar</button>
+                    <button type="submit" class="btn btn-sm btn-success actualizar" disabled>Actualizar</button>
+                  </div>
+                </td>
+              </form>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
+    </section>
+    
+    <section id="eliminar" class="section">
+      <h3>Clientes — Seguro de Vida</h3>
+      <?php $vida = $controller->listarClientesVidaActivos($_SESSION['id_agente']); ?>
+
+      <?php if (isset($_SESSION['eliminar_success'])): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          <?= $_SESSION['eliminar_success'] ?>
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php unset($_SESSION['eliminar_success']); ?>
+      <?php endif; ?>
+
+      <?php if (isset($_SESSION['eliminar_error'])): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <?= $_SESSION['eliminar_error'] ?>
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php unset($_SESSION['eliminar_error']); ?>
+      <?php endif; ?>
+
       <div class="table-responsive">
-        <table class="table table-hover table-bordered align-middle" data-tipo="vida">
+        <table class="table table-hover table-bordered">
           <thead class="table-dark">
             <tr>
-              <th>Nombre</th><th>Apellido Paterno</th><th>Apellido Materno</th>
-              <th>CURP</th><th>RFC</th><th>Teléfono</th>
-              <th>Usuario</th><th>Correo</th><th>Edad</th><th>Folio</th>
-              <th>Fecha Solicitud</th><th>Valor Asegurado</th><th>% Comisión</th>
-              <th>Sucursal</th><th>Acciones</th>
+              <th>Nombre</th>
+              <th>CURP</th>
+              <th>RFC</th>
+              <th>Teléfono</th>
+              <th>Usuario</th>
+              <th>Correo</th>
+              <th>Edad</th>
+              <th>Folio</th>
+              <th>Valor Asegurado</th>
+              <th>% Comisión</th>
+              <th>Fecha Solicitud</th>
+              <th>Sucursal</th>
+              <th>Estado Solicitud</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
             <?php foreach ($vida as $v): ?>
               <tr>
-                <form action="../controllers/ActualizarAController.php" method="post">
-                  <input type="hidden" name="tipo" value="vida">
-                  <input type="hidden" name="id" value="<?= $row['id_cliente'] ?>">
-
-
-
-                  <td><input type="text" class="form-control" name="nombre" value="<?= htmlspecialchars($v['nombre']) ?>" disabled></td>
-                  <td><input type="text" class="form-control" name="apellidoPaterno" value="<?= htmlspecialchars($v['apellidoPaterno']) ?>" disabled></td>
-                  <td><input type="text" class="form-control" name="apellidoMaterno" value="<?= htmlspecialchars($v['apellidoMaterno']) ?>" disabled></td>
-                  <td><input type="text" class="form-control" name="curp" value="<?= htmlspecialchars($v['curp']) ?>" disabled></td>
-                  <td><input type="text" class="form-control" name="rfc" value="<?= htmlspecialchars($v['rfc']) ?>" disabled></td>
-                  <td><input type="text" class="form-control" name="telefono" value="<?= htmlspecialchars($v['telefono']) ?>" disabled></td>
-                  <td><input type="text" class="form-control" name="usuario" value="<?= htmlspecialchars($v['usuario']) ?>" disabled></td>
-                  <td><input type="email" class="form-control" name="correo" value="<?= htmlspecialchars($v['correo']) ?>" disabled></td>
-                  <td><input type="number" class="form-control" name="edad" value="<?= htmlspecialchars($v['edad']) ?>" disabled></td>
-                  <td><input type="text" class="form-control" name="folio_vida" value="<?= htmlspecialchars($v['folio_vida']) ?>" disabled></td>
-                  <td><input type="date" class="form-control" name="fecha_solicitud" value="<?= htmlspecialchars($v['fecha_solicitud']) ?>" disabled></td>
-                  <td><input type="number" step="0.01" class="form-control" name="valor_asegurado" value="<?= htmlspecialchars($v['valor_asegurado']) ?>" disabled></td>
-                  <td><input type="number" step="0.01" class="form-control" name="porcentaje_comision" value="<?= htmlspecialchars($v['porcentaje_comision']) ?>" disabled></td>
-                  <td><input type="text" class="form-control" name="codigoSucursal" value="<?= htmlspecialchars($v['codigoSucursal']) ?>" disabled></td>
-                  <td>
-                    <div class="d-flex gap-2">
-                      <button type="button" class="btn btn-sm btn-primary editar">Editar</button>
-                      <button type="submit" class="btn btn-sm btn-success actualizar" disabled>Actualizar</button>
-                    </div>
-                  </td>
-                </form>
+                <td><?= htmlspecialchars($v['nombre'].' '.$v['apellidoPaterno'].' '.$v['apellidoMaterno']) ?></td>
+                <td><?= htmlspecialchars($v['curp']) ?></td>
+                <td><?= htmlspecialchars($v['rfc']) ?></td>
+                <td><?= htmlspecialchars($v['telefono']) ?></td>
+                <td><?= htmlspecialchars($v['usuario']) ?></td>
+                <td><?= htmlspecialchars($v['correo']) ?></td>
+                <td><?= htmlspecialchars($v['edad']) ?></td>
+                <td><?= htmlspecialchars($v['folio_vida']) ?></td>
+                <td><?= htmlspecialchars($v['valor_asegurado']) ?></td>
+                <td><?= htmlspecialchars($v['porcentaje_comision']) ?>%</td>
+                <td><?= htmlspecialchars($v['fecha_solicitud']) ?></td>
+                <td><?= htmlspecialchars($v['codigoSucursal']) ?></td>
+                <td><?= htmlspecialchars(($v['estado_solicitud'] ?? '—')) ?></td>
+                <td>
+                  <form action="../controllers/ActualizarAController.php" method="post" class="d-inline">
+                    <input type="hidden" name="accion" value="cambiar_estatus">
+                    <input type="hidden" name="id_solicitud" value="<?= htmlspecialchars($v['id_solicitud'] ?? '') ?>">
+                    <button type="submit" name="nuevo_estatus" value="Activo" class="btn btn-sm btn-success">Activar</button>
+                    <button type="submit" name="nuevo_estatus" value="Inactivo" class="btn btn-sm btn-danger">Desactivar</button>
+                  </form>
+                </td>
               </tr>
             <?php endforeach; ?>
           </tbody>
         </table>
       </div>
-
-
-     <h3>Actualizar Clientes — Seguro de Auto</h3>
-      <?php $auto = $controller->listarClientesAutoActivos($idAgente); ?>
-      <div class="table-responsive">
-        <table class="table table-hover table-bordered align-middle" data-tipo="auto">
-          <thead class="table-dark">
+      <h3>Clientes — Seguro de Auto</h3>
+    <?php $auto = $controller->listarClientesAutoActivos($_SESSION['id_agente']); ?>
+    <div class="table-responsive">
+      <table class="table table-hover table-bordered">
+        <thead class="table-dark">
+          <tr>
+            <th>Nombre</th>
+            <th>CURP</th>
+            <th>RFC</th>
+            <th>Teléfono</th>
+            <th>Usuario</th>
+            <th>Correo</th>
+            <th>Matrícula</th>
+            <th>Modelo</th>
+            <th>Año</th>
+            <th>Valor Factura</th>
+            <th>% Comisión</th>
+            <th>Fecha Solicitud</th>
+            <th>Sucursal</th>
+            <th>Estado Solicitud</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($auto as $au): ?>
             <tr>
-              <th>Nombre</th><th>Apellido Paterno</th><th>Apellido Materno</th>
-              <th>CURP</th><th>RFC</th><th>Teléfono</th>
-              <th>Usuario</th><th>Correo</th>
-              <th>Matrícula</th><th>Modelo</th><th>Año</th>
-              <th>Valor Factura</th><th>% Comisión</th>
-              <th>Fecha Solicitud</th>
-              <th>Sucursal</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php foreach ($auto as $au): ?>
-              <tr>
-                <form action="../controllers/ActualizarAController.php" method="post">
-                  <input type="hidden" name="tipo" value="auto">
-                  <input type="hidden" name="id" value="<?= $row['id_cliente'] ?>">
-
-
-                  <td><input type="text" class="form-control" name="nombre" value="<?= htmlspecialchars($au['nombre']) ?>" disabled></td>
-                  <td><input type="text" class="form-control" name="apellidoPaterno" value="<?= htmlspecialchars($au['apellidoPaterno']) ?>" disabled></td>
-                  <td><input type="text" class="form-control" name="apellidoMaterno" value="<?= htmlspecialchars($au['apellidoMaterno']) ?>" disabled></td>
-                  <td><input type="text" class="form-control" name="curp" value="<?= htmlspecialchars($au['curp']) ?>" disabled></td>
-                  <td><input type="text" class="form-control" name="rfc" value="<?= htmlspecialchars($au['rfc']) ?>" disabled></td>
-                  <td><input type="text" class="form-control" name="telefono" value="<?= htmlspecialchars($au['telefono']) ?>" disabled></td>
-
-                  <td><input type="text" class="form-control" name="usuario" value="<?= htmlspecialchars($au['usuario']) ?>" disabled></td>
-                  <td><input type="email" class="form-control" name="correo" value="<?= htmlspecialchars($au['correo']) ?>" disabled></td>
-
-                  <td><input type="text" class="form-control" name="matricula" value="<?= htmlspecialchars($au['matricula']) ?>" disabled></td>
-                  <td><input type="text" class="form-control" name="modelo" value="<?= htmlspecialchars($au['modelo']) ?>" disabled></td>
-                  <td><input type="number" class="form-control" name="anio" value="<?= htmlspecialchars($au['anio']) ?>" disabled></td>
-                  <td><input type="number" class="form-control" step="0.01" name="valor_factura" value="<?= htmlspecialchars($au['valor_factura']) ?>" disabled></td>
-                  <td><input type="number" class="form-control" step="0.01" name="porcentaje_comision" value="<?= htmlspecialchars($au['porcentaje_comision']) ?>" disabled></td>
-                  <td><input type="date" class="form-control" name="fecha_solicitud" value="<?= htmlspecialchars($au['fecha_solicitud']) ?>" disabled></td>
-
-                  <td><input type="text" class="form-control" name="codigoSucursal" value="<?= htmlspecialchars($au['codigoSucursal']) ?>" disabled></td>
-
-                  <td>
-                    <div class="d-flex gap-2">
-                      <button type="button" class="btn btn-sm btn-primary editar">Editar</button>
-                      <button type="submit" class="btn btn-sm btn-success actualizar" disabled>Actualizar</button>
-                    </div>
-                  </td>
+              <td><?= htmlspecialchars($au['nombre'].' '.$au['apellidoPaterno'].' '.$au['apellidoMaterno']) ?></td>
+              <td><?= htmlspecialchars($au['curp']) ?></td>
+              <td><?= htmlspecialchars($au['rfc']) ?></td>
+              <td><?= htmlspecialchars($au['telefono']) ?></td>
+              <td><?= htmlspecialchars($au['usuario']) ?></td>
+              <td><?= htmlspecialchars($au['correo']) ?></td>
+              <td><?= htmlspecialchars($au['matricula']) ?></td>
+              <td><?= htmlspecialchars($au['modelo']) ?></td>
+              <td><?= htmlspecialchars($au['anio']) ?></td>
+              <td><?= htmlspecialchars($au['valor_factura']) ?></td>
+              <td><?= htmlspecialchars($au['porcentaje_comision']) ?>%</td>
+              <td><?= htmlspecialchars($au['fecha_solicitud']) ?></td>
+              <td><?= htmlspecialchars($au['codigoSucursal']) ?></td>
+              <td><?= htmlspecialchars($au['estado_solicitud'] ?? '—') ?></td>
+              <td>
+                <form action="../controllers/ActualizarController.php" method="post" class="d-inline">
+                  <input type="hidden" name="accion" value="cambiar_estatus">
+                  <input type="hidden" name="id_solicitud" value="<?= htmlspecialchars($au['id_solicitud'] ?? '') ?>">
+                  <button type="submit" name="nuevo_estatus" value="Activo" class="btn btn-sm btn-success">Activar</button>
+                  <button type="submit" name="nuevo_estatus" value="Inactivo" class="btn btn-sm btn-danger">Desactivar</button>
                 </form>
-              </tr>
-            <?php endforeach; ?>
-          </tbody>
-        </table>
-      </div>
-<h3>Actualizar Clientes — Seguro de Robo</h3>
-<?php $robo = $controller->listarClientesRoboActivos($idAgente); ?>
-<div class="table-responsive">
-  <table class="table table-hover table-bordered align-middle" data-tipo="robo">
-    <thead class="table-dark">
-      <tr>
-        <th>Nombre</th><th>Apellido Paterno</th><th>Apellido Materno</th>
-        <th>CURP</th><th>RFC</th><th>Teléfono</th>
-        <th>Usuario</th><th>Correo</th>
-        <th>Objeto</th><th>Medidas Seguridad</th>
-        <th>Valor Artículo</th><th>% Comisión</th>
-        <th>Fecha Solicitud</th>
-        <th>Sucursal</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php foreach ($robo as $r): ?>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
+  <h3>Clientes — Seguro de Robo</h3>
+  <?php $robo = $controller->listarClientesRoboActivos($_SESSION['id_agente']); ?>
+  <div class="table-responsive">
+    <table class="table table-hover table-bordered">
+      <thead class="table-dark">
         <tr>
-          <form action="../controllers/ActualizarAController.php" method="post">
-            <input type="hidden" name="tipo" value="robo">
-            <input type="hidden" name="id" value="<?= $row['id_cliente'] ?>">
-
-            <td><input type="text" class="form-control" name="nombre" value="<?= htmlspecialchars($r['nombre']) ?>" disabled></td>
-            <td><input type="text" class="form-control" name="apellidoPaterno" value="<?= htmlspecialchars($r['apellidoPaterno']) ?>" disabled></td>
-            <td><input type="text" class="form-control" name="apellidoMaterno" value="<?= htmlspecialchars($r['apellidoMaterno']) ?>" disabled></td>
-            <td><input type="text" class="form-control" name="curp" value="<?= htmlspecialchars($r['curp']) ?>" disabled></td>
-            <td><input type="text" class="form-control" name="rfc" value="<?= htmlspecialchars($r['rfc']) ?>" disabled></td>
-            <td><input type="text" class="form-control" name="telefono" value="<?= htmlspecialchars($r['telefono']) ?>" disabled></td>
-
-            <td><input type="text" class="form-control" name="usuario" value="<?= htmlspecialchars($r['usuario']) ?>" disabled></td>
-            <td><input type="email" class="form-control" name="correo" value="<?= htmlspecialchars($r['correo']) ?>" disabled></td>
-
-            <td><input type="text" class="form-control" name="tipo_objeto" value="<?= htmlspecialchars($r['tipo_objeto']) ?>" disabled></td>
-            <td><input type="text" class="form-control" name="medidas_seguridad" value="<?= htmlspecialchars($r['medidas_seguridad']) ?>" disabled></td>
-            <td><input type="number" step="0.01" class="form-control" name="valor_articulo" value="<?= htmlspecialchars($r['valor_articulo']) ?>" disabled></td>
-            <td><input type="number" step="0.01" class="form-control" name="porcentaje_comision" value="<?= htmlspecialchars($r['porcentaje_comision']) ?>" disabled></td>
-            <td><input type="date" class="form-control" name="fecha_solicitud" value="<?= htmlspecialchars($r['fecha_solicitud']) ?>" disabled></td>
-
-            <td><input type="text" class="form-control" name="codigoSucursal" value="<?= htmlspecialchars($r['codigoSucursal']) ?>" disabled></td>
-
-            <td>
-              <div class="d-flex gap-2">
-                <button type="button" class="btn btn-sm btn-primary editar">Editar</button>
-                <button type="submit" class="btn btn-sm btn-success actualizar" disabled>Actualizar</button>
-              </div>
-            </td>
-          </form>
+          <th>Nombre</th><th>CURP</th><th>RFC</th><th>Teléfono</th>
+          <th>Usuario</th><th>Correo</th><th>Objeto</th><th>Medidas Seguridad</th><th>Valor Artículo</th>
+          <th>% Comisión</th>
+          <th>Fecha Solicitud</th><th>Sucursal</th>
+          <th>Estado Solicitud</th><th>Acciones</th>
         </tr>
-      <?php endforeach; ?>
-    </tbody>
-  </table>
-</div>
-<h3>Actualizar Clientes — Seguro de Incendio</h3>
-<?php $incendio = $controller->listarClientesIncendioActivos($idAgente); ?>
-<div class="table-responsive">
-  <table class="table table-hover table-bordered align-middle" data-tipo="incendio">
-    <thead class="table-dark">
-      <tr>
-        <th>Nombre</th><th>Apellido Paterno</th><th>Apellido Materno</th>
-        <th>CURP</th><th>RFC</th><th>Teléfono</th>
-        <th>Usuario</th><th>Correo</th>
-        <th>Valor Vivienda</th><th>Antigüedad</th>
-        <th>Nivel</th><th>Causa Probable</th><th>Tipo Construcción</th>
-        <th>% Comisión</th>
-        <th>Fecha Solicitud</th>
-        <th>Sucursal</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php foreach ($incendio as $i): ?>
+      </thead>
+      <tbody>
+        <?php foreach ($robo as $r): ?>
+          <tr>
+            <td><?= htmlspecialchars($r['nombre'].' '.$r['apellidoPaterno'].' '.$r['apellidoMaterno']) ?></td>
+            <td><?= htmlspecialchars($r['curp']) ?></td>
+            <td><?= htmlspecialchars($r['rfc']) ?></td>
+            <td><?= htmlspecialchars($r['telefono']) ?></td>
+            <td><?= htmlspecialchars($r['usuario']) ?></td>
+            <td><?= htmlspecialchars($r['correo']) ?></td>
+            <td><?= htmlspecialchars($r['tipo_objeto']) ?></td>
+            <td><?= htmlspecialchars($r['medidas_seguridad']) ?></td>
+            <td><?= htmlspecialchars($r['valor_articulo']) ?></td>
+            <td><?= htmlspecialchars($r['porcentaje_comision']) ?>%</td>
+            <td><?= htmlspecialchars($r['fecha_solicitud']) ?></td>
+            <td><?= htmlspecialchars($r['codigoSucursal']) ?></td>
+            <td><?= htmlspecialchars($r['estado_solicitud'] ?? '—') ?></td>
+            <td>
+              <form action="../controllers/ActualizarController.php" method="post" class="d-inline">
+                <input type="hidden" name="accion" value="cambiar_estatus">
+                <input type="hidden" name="id_solicitud" value="<?= htmlspecialchars($r['id_solicitud'] ?? '') ?>">
+                <button type="submit" name="nuevo_estatus" value="Activo" class="btn btn-sm btn-success">Activar</button>
+                <button type="submit" name="nuevo_estatus" value="Inactivo" class="btn btn-sm btn-danger">Desactivar</button>
+              </form>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+  </div>
+  <h3>Clientes — Seguro de Incendio</h3>
+  <?php $inc = $controller->listarClientesIncendioActivos($_SESSION['id_agente']); ?>
+  <div class="table-responsive">
+    <table class="table table-hover table-bordered">
+      <thead class="table-dark">
         <tr>
-          <form action="../controllers/ActualizarAController.php" method="post">
-            <input type="hidden" name="tipo" value="incendio">
-            <input type="hidden" name="id" value="<?= $row['id_cliente'] ?>">
-  
-            <td><input type="text" class="form-control" name="nombre" value="<?= htmlspecialchars($i['nombre']) ?>" disabled></td>
-            <td><input type="text" class="form-control" name="apellidoPaterno" value="<?= htmlspecialchars($i['apellidoPaterno']) ?>" disabled></td>
-            <td><input type="text" class="form-control" name="apellidoMaterno" value="<?= htmlspecialchars($i['apellidoMaterno']) ?>" disabled></td>
-            <td><input type="text" class="form-control" name="curp" value="<?= htmlspecialchars($i['curp']) ?>" disabled></td>
-            <td><input type="text" class="form-control" name="rfc" value="<?= htmlspecialchars($i['rfc']) ?>" disabled></td>
-            <td><input type="text" class="form-control" name="telefono" value="<?= htmlspecialchars($i['telefono']) ?>" disabled></td>
-
-            <td><input type="text" class="form-control" name="usuario" value="<?= htmlspecialchars($i['usuario']) ?>" disabled></td>
-            <td><input type="email" class="form-control" name="correo" value="<?= htmlspecialchars($i['correo']) ?>" disabled></td>
-
-            <td><input type="number" class="form-control" name="valor_vivienda" value="<?= htmlspecialchars($i['valor_vivienda']) ?>" disabled></td>
-            <td><input type="number" class="form-control" name="antiguedad" value="<?= htmlspecialchars($i['antiguedad']) ?>" disabled></td>
-            <td><input type="text" class="form-control" name="nivel_incendio" value="<?= htmlspecialchars($i['nivel_incendio']) ?>" disabled></td>
-            <td><input type="text" class="form-control" name="causa_probable" value="<?= htmlspecialchars($i['causa_probable']) ?>" disabled></td>
-            <td><input type="text" class="form-control" name="tipo_construccion" value="<?= htmlspecialchars($i['tipo_construccion']) ?>" disabled></td>
-            <td><input type="number" step="0.01" class="form-control" name="porcentaje_comision" value="<?= htmlspecialchars($i['porcentaje_comision']) ?>" disabled></td>
-            <td><input type="date" class="form-control" name="fecha_solicitud" value="<?= htmlspecialchars($i['fecha_solicitud']) ?>" disabled></td>
-
-            <td><input type="text" class="form-control" name="codigoSucursal" value="<?= htmlspecialchars($i['codigoSucursal']) ?>" disabled></td>
-
-            <td>
-              <div class="d-flex gap-2">
-                <button type="button" class="btn btn-sm btn-primary editar">Editar</button>
-                <button type="submit" class="btn btn-sm btn-success actualizar" disabled>Actualizar</button>
-              </div>
-            </td>
-          </form>
+          <th>Nombre</th><th>CURP</th><th>RFC</th><th>Teléfono</th>
+          <th>Usuario</th><th>Correo</th><th>Valor Vivienda</th><th>Antigüedad</th>
+          <th>Nivel</th><th>Causa Probable</th><th>Tipo Construcción</th>
+          <th>Fecha Solicitud</th><th>% Comisión</th><th>Sucursal</th>
+          <th>Estado Solicitud</th><th>Acciones</th>
         </tr>
-      <?php endforeach; ?>
-    </tbody>
-  </table>
-</div>
-
-    </section>
-    
-    <section id="eliminar" class="section <?php echo $activeSection === 'eliminar' ? 'active' : ''; ?>">
-      <h3>Eliminar</h3>
-      <p>Confirmación para eliminar.</p>
+      </thead>
+      <tbody>
+        <?php foreach ($inc as $i): ?>
+          <tr>
+            <td><?= htmlspecialchars($i['nombre'].' '.$i['apellidoPaterno'].' '.$i['apellidoMaterno']) ?></td>
+            <td><?= htmlspecialchars($i['curp']) ?></td>
+            <td><?= htmlspecialchars($i['rfc']) ?></td>
+            <td><?= htmlspecialchars($i['telefono']) ?></td>
+            <td><?= htmlspecialchars($i['usuario']) ?></td>
+            <td><?= htmlspecialchars($i['correo']) ?></td>
+            <td><?= htmlspecialchars($i['valor_vivienda']) ?></td>
+            <td><?= htmlspecialchars($i['antiguedad']) ?></td>
+            <td><?= htmlspecialchars($i['nivel_incendio']) ?></td>
+            <td><?= htmlspecialchars($i['causa_probable']) ?></td>
+            <td><?= htmlspecialchars($i['tipo_construccion']) ?></td>
+            <td><?= htmlspecialchars($i['fecha_solicitud']) ?></td>
+            <td><?= htmlspecialchars($i['porcentaje_comision']) ?>%</td>
+            <td><?= htmlspecialchars($i['codigoSucursal']) ?></td>
+            <td><?= htmlspecialchars($i['estado_solicitud'] ?? '—') ?></td>
+            <td>
+              <form action="../controllers/ActualizarController.php" method="post" class="d-inline">
+                <input type="hidden" name="accion" value="cambiar_estatus">
+                <input type="hidden" name="id_solicitud" value="<?= htmlspecialchars($i['id_solicitud'] ?? '') ?>">
+                <button type="submit" name="nuevo_estatus" value="Activo" class="btn btn-sm btn-success">Activar</button>
+                <button type="submit" name="nuevo_estatus" value="Inactivo" class="btn btn-sm btn-danger">Desactivar</button>
+              </form>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+  </div>
     </section>
   </main>
 
@@ -760,26 +1038,33 @@
       var el = document.getElementById(id);
       if (el) el.classList.add('active');
     }
+
     function logout() {
       window.location.href = "../../public/logout.php";
     }
+
     function mostrarTabla() {
       document.getElementById('tablaSeguros').style.display = 'block';
     }
 
-  
     function calcularTotalRecursivo() {
+      //seleccionamos las filas de la tabla
       const filas = document.querySelectorAll('#tablaSolicitudes tbody tr');
 
+      //con esta funcion calculamos la comision por fila
       function calcular(filaActual) {
-        if (filaActual >= filas.length) return 0;
+        //nuestra primer condicion validamos si filaactual es mayor al tamaño de filas, en caso de no serlo termina la recursividad
+        if (filaActual >= filas.length) return 0;  
+        const celdas = filas[filaActual].children;
+        if (celdas.length < 6) return calcular(filaActual + 1); 
 
-        const cantidad = parseFloat(filas[filaActual].children[2].textContent) || 0;
-        const porcentaje = parseFloat(filas[filaActual].children[4].textContent) || 0;
+        //obtenemos los datos de la celda 3 y 5 para poder realizar el calculo de comision
+        const cantidad = parseFloat(celdas[3].textContent) || 0;
+        const porcentaje = parseFloat(celdas[5].textContent) || 0;
         const comision = cantidad * porcentaje / 100;
 
         console.log(`Fila ${filaActual}: cantidad=${cantidad}, porcentaje=${porcentaje}, comisión=${comision}`);
-
+        //retorna la comision de la fina en la que nos encontremos y vuelve a llamarse a si misma, sumando una vuelta para no hacer un bucle infinito
         return comision + calcular(filaActual + 1);
       }
 
@@ -787,6 +1072,7 @@
       document.getElementById('resultado').textContent =
         "Comisión total generada: $" + total.toFixed(2);
     }
+
 
     //habilitar los inputs de crear poliza
     document.getElementById('tipoSeguro').addEventListener('change', function() {
@@ -892,6 +1178,83 @@
       `;
     }
   });
+
+  document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('formBuscar');
+  const inputCriterio = document.getElementById('criterio');
+  const feedbackInput = document.getElementById('feedbackInput');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const criterio = inputCriterio.value;
+    // Validación antes de enviar
+    if (!criterio.trim()) {
+      inputCriterio.classList.add('is-invalid');
+      feedbackInput.textContent = 'Debes ingresar un criterio de búsqueda';
+      return;
+    } else {
+      inputCriterio.classList.remove('is-invalid');
+      feedbackInput.textContent = '';
+    }
+    const formData = new FormData(form);
+    try {
+      const res = await fetch(form.action, { method: 'POST', body: formData });
+      const data = await res.json();
+      console.log("Respuesta JSON:", data);
+
+      const tabla = document.getElementById('tablaResultado');
+      const mensajeError = document.getElementById('mensajeError');
+
+      if (data.success) {
+        // Construir tabla con múltiples filas
+        tabla.innerHTML = `
+          <thead class="table-dark">
+            <tr>
+              <th>ID Cliente</th>
+              <th>Nombre</th>
+              <th>CURP</th>
+              <th>RFC</th>
+              <th>Teléfono</th>
+              <th>Correo</th>
+              <th>Seguros</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${data.clientes.map(c => `
+              <tr>
+                <td>${c.id_cliente}</td>
+                <td>${c.nombre} ${c.apellidoPaterno ?? ''} ${c.apellidoMaterno ?? ''}</td>
+                <td>${c.curp}</td>
+                <td>${c.rfc}</td>
+                <td>${c.telefono}</td>
+                <td>${c.correo}</td>
+                <td>${c.seguros && c.seguros.length ? c.seguros.join('<br>') : 'N/A'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        `;
+        mensajeError.style.display = 'none';
+        tabla.style.display = 'table';
+      } else {
+        tabla.style.display = 'none';
+        mensajeError.textContent = data.message;
+        mensajeError.style.display = 'block';
+      }
+    } catch (err) {
+      console.error("Error en fetch:", err);
+      const tabla = document.getElementById('tablaResultado');
+      const mensajeError = document.getElementById('mensajeError');
+      tabla.style.display = 'none';
+      mensajeError.textContent = "Error en la búsqueda";
+      mensajeError.style.display = 'block';
+    }
+  });
+});
+
+
+
+
+
   //validacion con bootstrap
   (() => {
   'use strict';
@@ -916,6 +1279,22 @@ document.querySelectorAll(".editar").forEach(btn => {
   });
 });
 
+    function toggleSidebar() {
+      document.querySelector('.sidebar').classList.toggle('open');
+    }
+
+// Cierra el sidebar si haces clic fuera de él
+document.addEventListener('click', function(e) {
+  const sidebar = document.querySelector('.sidebar');
+  const toggleBtn = document.querySelector('.sidebar-toggle');
+  if (sidebar.classList.contains('open') &&
+      !sidebar.contains(e.target) &&
+      !toggleBtn.contains(e.target)) {
+    sidebar.classList.remove('open');
+  }
+});
+
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

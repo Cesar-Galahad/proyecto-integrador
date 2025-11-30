@@ -1,5 +1,6 @@
 <?php
-require_once __DIR__ . '/../models/Agente.php';
+require_once dirname(__DIR__) . '/models/Agente.php';
+require_once dirname(__DIR__) . '/models/ListaOrdenada.php';
 
 class AgenteController {
     private $agenteModel;
@@ -17,34 +18,42 @@ class AgenteController {
     public function listarClientesVidaActivos($idAgente) {
         return $this->agenteModel->listarClientesVidaActivos($idAgente);
     }
-
     public function listarClientesAutoActivos($idAgente) {
         return $this->agenteModel->listarClientesAutoActivos($idAgente);
     }
-
     public function listarClientesRoboActivos($idAgente) {
         return $this->agenteModel->listarClientesRoboActivos($idAgente);
     }
-
     public function listarClientesIncendioActivos($idAgente) {
         return $this->agenteModel->listarClientesIncendioActivos($idAgente);
     }
-    public function ordenarClientes($tabla, $campoOrden, &$vida, &$auto, &$robo, &$incendio) {
-        $cmp = function($a, $b) use ($campoOrden) {
-            if ($campoOrden === 'fecha_solicitud') {
-                return strtotime($a[$campoOrden] ?? '') <=> strtotime($b[$campoOrden] ?? '');
-            }
-            return strcmp(($a[$campoOrden] ?? ''), ($b[$campoOrden] ?? ''));
-        };
-
-        if ($tabla === 'vida') usort($vida, $cmp);
-        if ($tabla === 'auto') usort($auto, $cmp);
-        if ($tabla === 'robo') usort($robo, $cmp);
-        if ($tabla === 'incendio') usort($incendio, $cmp);
-
-        // Guardar sección activa
-        $_SESSION['active_section'] = 'leer';
+    public function listarSolicitudesVendidas($idAgente) {
+        return $this->agenteModel->listarSolicitudesVendidas($idAgente);
     }
 
+    public function ordenarClientes($tabla, $campoOrden, &$vida, &$auto, &$robo, &$incendio, $ascendente = true) {
+        if ($tabla === 'vida') {
+            $lista = new ListaOrdenada($campoOrden, $ascendente);
+            foreach ($vida as $v) $lista->insertar($v);
+            $vida = $lista->obtenerTodos();
+        }
+        if ($tabla === 'auto') {
+            $lista = new ListaOrdenada($campoOrden, $ascendente);
+            foreach ($auto as $a) $lista->insertar($a);
+            $auto = $lista->obtenerTodos();
+        }
+        if ($tabla === 'robo') {
+            $lista = new ListaOrdenada($campoOrden, $ascendente);
+            foreach ($robo as $r) $lista->insertar($r);
+            $robo = $lista->obtenerTodos();
+        }
+        if ($tabla === 'incendio') {
+            $lista = new ListaOrdenada($campoOrden, $ascendente);
+            foreach ($incendio as $i) $lista->insertar($i);
+            $incendio = $lista->obtenerTodos();
+        }
+
+        $_SESSION['active_section'] = 'leer';
+    }
 }
 

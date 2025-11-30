@@ -208,6 +208,40 @@ body {
   min-width: 180px;   /* CURP y RFC necesitan espacio */
 }
 
+/* Banner */
+.banner img {
+  border: 1px solid white; /* borde oscuro */
+  border-radius: 6px;        /* esquinas redondeadas */
+}
+
+/* Cards */
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.card-title {
+  font-weight: 600;
+  color: #343a40;
+}
+
+.card-text {
+  font-size: 0.95rem;
+  color: #555;
+}
+.card-img-top {
+  width: 150px;
+  height: 150px;
+  object-fit: contain; /* ajusta sin recortar */
+  margin: 10px auto;
+}
+
+
+
 
 /* Desktop: oculta toggle */
 @media (min-width: 901px) {

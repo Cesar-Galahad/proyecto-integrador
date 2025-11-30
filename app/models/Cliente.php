@@ -8,13 +8,25 @@ private $pdo;
     public function __construct() {
         $this->pdo = DB::connect();
     }
-
-    public function crear($data) {
-        $stmt = $this->pdo->prepare("INSERT INTO cliente (nombre, apellidoPaterno, apellidoMaterno, curp, rfc, telefono, direccion)
-                                     VALUES (:nombre, :apellidoPaterno, :apellidoMaterno, :curp, :rfc, :telefono, :direccion)");
-        $stmt->execute($data);
-        return $this->pdo->lastInsertId();
+    public function obtenerPerfilCliente($idCliente) {
+        $sql = "SELECT 
+                    c.id_cliente,
+                    c.nombre,
+                    c.apellidoPaterno,
+                    c.apellidoMaterno,
+                    c.curp,
+                    c.rfc,
+                    c.telefono,
+                    c.direccion,
+                    u.usuario,
+                    u.correo
+                FROM cliente c
+                INNER JOIN usuarios u ON u.id_cliente = c.id_cliente
+                WHERE c.id_cliente = :idCliente
+                LIMIT 1";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':idCliente' => $idCliente]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-
 
 }

@@ -1,11 +1,11 @@
 <?php
-// app/Models/Node.php
 class Node {
-  public $data;
-  public $next;
+    public $data;
+    public $next;
 
-  public function __construct($data) {
-    $this->data = $data;
-    $this->next = null;
-  }
+    public function __construct($data) {
+        $this->data = $data;
+        $this->next = null;
+    }
 }
+
