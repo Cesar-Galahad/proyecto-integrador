@@ -16,7 +16,7 @@ $usuario = $perfilCliente['usuario'] ?? '';
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Dashboard Cliente — Aseguradora</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="../../proyecto-integrador/public/css/shared.css">
+  <link rel="stylesheet" href="../../public/css/shared.css">
   <link rel="stylesheet" href="../../public/css/dashboard.css">
 </head>
 <body>
@@ -212,12 +212,151 @@ $usuario = $perfilCliente['usuario'] ?? '';
     <?php endif; ?>
   </section>
 
-    <section id="mis-seguros" class="section">
-      <h3>Seguros contratados</h3>
-      <div id="segurosList">
-        <p class="text-muted">Aquí cargarías las pólizas desde la BD.</p>
+<section id="seguro" class="section">
+  <h3>Seguros contratados</h3>
+  <div class="row text-center mb-4">
+    <div class="col-md-3">
+      <img src="../../public/assets/vida.png" alt="Seguro de Vida" class="img-fluid seguro-icon" data-target="#vidaTable">
+    </div>
+    <div class="col-md-3">
+      <img src="../../public/assets/auto.png" alt="Seguro de Auto" class="img-fluid seguro-icon" data-target="#autoTable">
+    </div>
+    <div class="col-md-3">
+      <img src="../../public/assets/robo.png" alt="Seguro de Robo" class="img-fluid seguro-icon" data-target="#roboTable">
+    </div>
+    <div class="col-md-3">
+      <img src="../../public/assets/incendio.png" alt="Seguro de Incendio" class="img-fluid seguro-icon" data-target="#incendioTable">
+    </div>
+  </div>
+
+  <!-- Tablas ocultas -->
+  <div id="vidaTable" class="collapse seguro-table mt-3">
+    <?php if ($vida = $controller->segurosVida($_SESSION['id_cliente'])): ?>
+      <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>Folio</th><th>Edad</th><th>Enfermedades</th><th>Valor asegurado</th><th>Comisión (%)</th><th>Fecha solicitud</th><th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><?= htmlspecialchars($vida['folio_vida']) ?></td>
+              <td><?= htmlspecialchars($vida['edad']) ?></td>
+              <td><?= htmlspecialchars($vida['enfermedades_preexistentes']) ?></td>
+              <td>$<?= number_format($vida['valor_asegurado'], 2) ?></td>
+              <td><?= htmlspecialchars($vida['porcentaje_comision']) ?>%</td>
+              <td><?= htmlspecialchars($vida['fecha_solicitud']) ?></td>
+              <td>
+                <button class="btn btn-sm btn-primary" onclick="descargarPoliza('vida', <?= $vida['id_vida'] ?>)">PDF</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-    </section>
+    <?php else: ?>
+      <p>No tiene seguro de vida contratado.</p>
+    <?php endif; ?>
+  </div>
+
+
+  <div id="autoTable" class="collapse seguro-table mt-3">
+    <?php $autos = $controller->segurosAuto($_SESSION['id_cliente']); ?>
+    <?php if (!empty($autos)): ?>
+      <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>Matrícula</th><th>Modelo</th><th>Año</th><th>Valor factura</th><th>Comisión (%)</th><th>Fecha solicitud</th><th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($autos as $auto): ?>
+              <tr>
+                <td><?= htmlspecialchars($auto['matricula']) ?></td>
+                <td><?= htmlspecialchars($auto['modelo']) ?></td>
+                <td><?= htmlspecialchars($auto['anio']) ?></td>
+                <td>$<?= number_format($auto['valor_factura'], 2) ?></td>
+                <td><?= htmlspecialchars($auto['porcentaje_comision']) ?>%</td>
+                <td><?= htmlspecialchars($auto['fecha_solicitud']) ?></td>
+                <td>
+                  <button class="btn btn-sm btn-primary" onclick="descargarPoliza('auto', <?= $auto['id_auto'] ?>)">PDF</button>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+    <?php else: ?>
+      <p>No tiene seguros de auto contratados.</p>
+    <?php endif; ?>
+  </div>
+
+  <div id="roboTable" class="collapse seguro-table mt-3">
+    <?php $robos = $controller->segurosRobo($_SESSION['id_cliente']); ?>
+    <?php if (!empty($robos)): ?>
+      <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>Objeto</th><th>Medidas seguridad</th><th>Valor artículo</th><th>Comisión (%)</th><th>Fecha solicitud</th><th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($robos as $robo): ?>
+              <tr>
+                <td><?= htmlspecialchars($robo['tipo_objeto']) ?></td>
+                <td><?= htmlspecialchars($robo['medidas_seguridad']) ?></td>
+                <td>$<?= number_format($robo['valor_articulo'], 2) ?></td>
+                <td><?= htmlspecialchars($robo['porcentaje_comision']) ?>%</td>
+                <td><?= htmlspecialchars($robo['fecha_solicitud']) ?></td>
+                <td>
+                  <button class="btn btn-sm btn-primary" onclick="descargarPoliza('robo', <?= $robo['id_robo'] ?>)">PDF</button>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+    <?php else: ?>
+      <p>No tiene seguros de robo contratados.</p>
+    <?php endif; ?>
+  </div>
+
+  <div id="incendioTable" class="collapse seguro-table mt-3">
+  <?php $incendios = $controller->segurosIncendio($_SESSION['id_cliente']); ?>
+  <?php if (!empty($incendios)): ?>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover align-middle">
+        <thead class="table-dark">
+          <tr>
+            <th>Valor vivienda</th><th>Antigüedad</th><th>Nivel</th><th>Causa probable</th><th>Construcción</th><th>Comisión (%)</th><th>Fecha solicitud</th><th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($incendios as $incendio): ?>
+            <tr>
+              <td>$<?= number_format($incendio['valor_vivienda'], 2) ?></td>
+              <td><?= htmlspecialchars($incendio['antiguedad']) ?> años</td>
+              <td><?= htmlspecialchars($incendio['nivel_incendio']) ?></td>
+              <td><?= htmlspecialchars($incendio['causa_probable']) ?></td>
+              <td><?= htmlspecialchars($incendio['tipo_construccion']) ?></td>
+              <td><?= htmlspecialchars($incendio['porcentaje_comision']) ?>%</td>
+              <td><?= htmlspecialchars($incendio['fecha_solicitud']) ?></td>
+              <td>
+                <button class="btn btn-sm btn-primary" onclick="descargarPoliza('incendio', <?= $incendio['id_incendio'] ?>)">PDF</button>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
+  <?php else: ?>
+    <p>No tiene seguros de incendio contratados.</p>
+  <?php endif; ?>
+</div>
+
+</section>
   </main>
 
   <script>
@@ -226,10 +365,12 @@ $usuario = $perfilCliente['usuario'] ?? '';
       var el = document.getElementById(id);
       if (el) el.classList.add('active');
     }
+
     function logout() {
       window.location.href = "../../public/logout.php";
     }
-        function toggleSidebar() {
+
+    function toggleSidebar() {
       document.querySelector('.sidebar').classList.toggle('open');
     }
 
@@ -243,6 +384,32 @@ $usuario = $perfilCliente['usuario'] ?? '';
         sidebar.classList.remove('open');
       }
     });
+
+    // Listener único para las imágenes de seguros
+    document.querySelectorAll('.seguro-icon').forEach(icon => {
+      icon.addEventListener('click', function() {
+        // Ocultar todas las tablas
+        document.querySelectorAll('.seguro-table').forEach(tbl => tbl.classList.remove('show'));
+
+        // Quitar efecto de selección en todas las imágenes
+        document.querySelectorAll('.seguro-icon').forEach(img => img.classList.remove('active-icon'));
+
+        // Mostrar solo la tabla seleccionada
+        const target = document.querySelector(this.dataset.target);
+        if (target) target.classList.add('show');
+
+        // Marcar la imagen seleccionada con transición
+        this.classList.add('active-icon');
+      });
+    });
+
+    // Descargar póliza en PDF
+    function descargarPoliza(tipo, id) {
+      window.location.href = "../../public/pdf.php?tipo=" + tipo + "&id=" + id;
+    }
+
+
+
   </script>
 </body>
 </html>

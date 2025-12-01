@@ -213,104 +213,154 @@
     </section>
 
 
-  <section id="crear" class="section <?php echo $activeSection === 'crear' ? 'active' : ''; ?>">
-  <h3>Crear nueva póliza</h3>
-        <?php if (isset($_SESSION['crear_success'])): ?>
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <?= $_SESSION['crear_success']; ?>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-  </div>
-  <?php unset($_SESSION['crear_success']); ?>
-<?php endif; ?>
+    <section id="crear" class="section <?php echo $activeSection === 'crear' ? 'active' : ''; ?>">
+      <h3>Crear nueva póliza</h3>
 
-    <form method="POST" action="../controllers/CrearPoliza.php" 
-          class="row g-3 needs-validation" novalidate>
+      <!-- Feedback -->
+      <?php if (isset($_SESSION['crear_success'])): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          <?= $_SESSION['crear_success']; ?>
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php unset($_SESSION['crear_success']); ?>
+      <?php endif; ?>
 
-      <!-- Datos del cliente -->
-      <h5>Datos del cliente</h5>
-      <div class="col-md-4">
-        <label>Nombre</label>
-        <input type="text" name="nombre" class="form-control" required>
-        <div class="invalid-feedback">El nombre es obligatorio.</div>
-      </div>
-      <div class="col-md-4">
-        <label>Apellido paterno</label>
-        <input type="text" name="apellidoPaterno" class="form-control" required>
-        <div class="invalid-feedback">El apellido paterno es obligatorio.</div>
-      </div>
-      <div class="col-md-4">
-        <label>Apellido materno</label>
-        <input type="text" name="apellidoMaterno" class="form-control" required>
-        <div class="invalid-feedback">El apellido materno es obligatorio.</div>
-      </div>
-      <div class="col-md-4">
-        <label>CURP</label>
-        <input type="text" name="curp" class="form-control" required>
-        <div class="invalid-feedback">La CURP es obligatoria.</div>
-      </div>
-      <div class="col-md-4">
-        <label>RFC</label>
-        <input type="text" name="rfc" class="form-control" required>
-        <div class="invalid-feedback">El RFC es obligatorio.</div>
-      </div>
-      <div class="col-md-4">
-        <label>Teléfono</label>
-        <input type="text" name="telefono" class="form-control" required>
-        <div class="invalid-feedback">El teléfono es obligatorio.</div>
-      </div>
-      <div class="col-12">
-        <label>Dirección</label>
-        <input type="text" name="direccion" class="form-control" required>
-        <div class="invalid-feedback">La dirección es obligatoria.</div>
-      </div>
+      <?php if (isset($_SESSION['crear_error'])): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <?= $_SESSION['crear_error']; ?>
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php unset($_SESSION['crear_error']); ?>
+      <?php endif; ?>
+
+      <form method="POST" action="../controllers/CrearPoliza.php" class="row g-3 needs-validation" novalidate>
+
+        <!-- Selección tipo de cliente -->
+        <h5>Tipo de cliente</h5>
+        <div class="col-md-4">
+          <label>¿Cliente nuevo o existente?</label>
+          <select name="tipoCliente" id="tipoCliente" class="form-select" required>
+            <option value="">Selecciona...</option>
+            <option value="nuevo">Nuevo cliente</option>
+            <option value="existente">Cliente existente</option>
+          </select>
+          <div class="invalid-feedback">Debes seleccionar una opción.</div>
+        </div>
 
 
-      <!-- Datos de la solicitud -->
-      <h5 class="mt-4">Datos de la solicitud</h5>
-      <div class="col-md-4">
-        <label>Tipo de seguro</label>
-        <select name="idTipoSeguro" id="tipoSeguro" class="form-select" required>
-          <option value="">Selecciona...</option>
-          <option value="vida">Vida</option>
-          <option value="auto">Auto</option>
-          <option value="incendio">Incendio</option>
-          <option value="robo">Robo</option>
-        </select>
-        <div class="invalid-feedback">Debes seleccionar un tipo de seguro.</div>
-      </div>
-      <div class="col-md-4">
-        <label>Fecha de recepción</label>
-        <input type="date" name="fechaRecepcion" class="form-control" required>
-        <div class="invalid-feedback">La fecha de recepción es obligatoria.</div>
-      </div>
+        <!-- Bloque búsqueda por CURP (solo existente) -->
+        <div id="curpBusqueda" class="col-md-4" style="display:none;">
+          <label>CURP del cliente</label>
+          <input type="text" name="curpBusqueda" class="form-control" required minlength="18" maxlength="18">
+          <div class="form-text">Ingresa el CURP para buscar al cliente existente.</div>
+          <div class="invalid-feedback">La CURP debe tener exactamente 18 caracteres.</div>
+        </div>
 
-      <!-- Inputs dinámicos -->
-      <div id="inputsSeguro" class="row g-3 mt-3"></div>
+        <!-- Bloque datos del cliente (solo nuevo, distribución original) -->
+        <div class="bloque-cliente" style="display:none;">
+          <h5>Datos del cliente</h5>
+          <div class="col-md-4">
+            <label>Nombre</label>
+            <input type="text" name="nombre" class="form-control" required>
+          </div>
+          <div class="col-md-4">
+            <label>Apellido paterno</label>
+            <input type="text" name="apellidoPaterno" class="form-control" required>
+          </div>
+          <div class="col-md-4">
+            <label>Apellido materno</label>
+            <input type="text" name="apellidoMaterno" class="form-control" required>
+          </div>
+          <div class="col-md-4">
+            <label>CURP</label>
+            <input type="text" name="curp" class="form-control" required minlength="18" maxlength="18">
+            <div class="invalid-feedback">La CURP debe tener exactamente 18 caracteres.</div>
+          </div>
+          <div class="col-md-4">
+            <label>RFC</label>
+            <input type="text" name="rfc" class="form-control" required minlength="13" maxlength="13">
+            <div class="invalid-feedback">El RFC debe tener exactamente 13 caracteres.</div>
+          </div>
+          <div class="col-md-4">
+            <label>Teléfono</label>
+            <input type="text" name="telefono" class="form-control" required pattern="[0-9]{10}">
+            <div class="invalid-feedback">El teléfono debe tener exactamente 10 dígitos.</div>
+          </div>
+          <div class="col-12">
+            <label>Dirección</label>
+            <input type="text" name="direccion" class="form-control" required>
+          </div>
+        </div>
 
-      <!-- Credenciales del cliente -->
-      <h5 class="mt-4">Credenciales de acceso</h5>
-      <div class="col-md-6">
-        <label>Nombre de usuario</label>
-        <input type="text" name="usuario" class="form-control" required>
-        <div class="invalid-feedback">El usuario es obligatorio.</div>
-      </div>
-      <div class="col-md-6">
-        <label>Contraseña</label>
-        <input type="password" name="passwordCliente" class="form-control" required>
-        <div class="invalid-feedback">La contraseña es obligatoria.</div>
-      </div>
-      <div class="col-md-6">
-        <label>Correo</label>
-        <input type="email" name="correo" class="form-control" required>
-        <div class="invalid-feedback">El correo es obligatorio.</div>
-      </div>
+        <!-- Bloque credenciales (solo nuevo) -->
+        <div class="bloque-credenciales" style="display:none;">
+          <h5 class="mt-4">Credenciales de acceso</h5>
+          <div class="col-md-6">
+            <label>Nombre de usuario</label>
+            <input type="text" name="usuario" class="form-control" required>
+          </div>
+          <div class="col-md-6">
+            <label>Contraseña</label>
+            <input type="password" name="passwordCliente" class="form-control" required>
+          </div>
+          <div class="col-md-6">
+            <label>Correo</label>
+            <input type="email" name="correo" class="form-control" required>
+          </div>
+        </div>
 
-      <!-- Botón -->
-      <div class="col-12 mt-4">
-        <button type="submit" class="btn btn-primary">Registrar póliza</button>
-      </div>
-    </form>
-  </section>
+
+        <!-- Bloque solicitud -->
+        <h5 class="mt-4">Datos de la solicitud</h5>
+        <div class="col-md-4">
+          <label>Tipo de seguro</label>
+          <select name="idTipoSeguro" id="tipoSeguro" class="form-select" required>
+            <option value="">Selecciona...</option>
+            <option value="vida">Vida</option>
+            <option value="auto">Auto</option>
+            <option value="incendio">Incendio</option>
+            <option value="robo">Robo</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label>Fecha de recepción</label>
+          <input type="date" name="fechaRecepcion" class="form-control" required>
+        </div>
+
+        <!-- Inputs dinámicos de seguro -->
+        <div id="inputsSeguro" class="row g-3 mt-3"></div>
+
+        <!-- Botón -->
+        <div class="col-12 mt-4">
+          <button type="submit" class="btn btn-primary">Registrar póliza</button>
+        </div>
+      </form>
+    </section>
+
+<script>
+  // Mostrar/ocultar bloques según tipo de cliente
+  document.getElementById('tipoCliente').addEventListener('change', function() {
+    const tipo = this.value;
+    const bloqueCliente = document.querySelector('.bloque-cliente');
+    const bloqueCredenciales = document.querySelector('.bloque-credenciales');
+    const curpBusqueda = document.getElementById('curpBusqueda');
+
+    if (tipo === 'existente') {
+      bloqueCliente.style.display = 'none';
+      bloqueCredenciales.style.display = 'none';
+      curpBusqueda.style.display = 'block';
+    } else if (tipo === 'nuevo') {
+      bloqueCliente.style.display = 'block';
+      bloqueCredenciales.style.display = 'block';
+      curpBusqueda.style.display = 'none';
+    } else {
+      // Selecciona... → ocultar todo
+      bloqueCliente.style.display = 'none';
+      bloqueCredenciales.style.display = 'none';
+      curpBusqueda.style.display = 'none';
+    }
+  });
+</script>
 
 
     <section id="leer" class="section <?php echo $activeSection === 'leer' ? 'active' : ''; ?>">
@@ -1072,6 +1122,55 @@
       document.getElementById('resultado').textContent =
         "Comisión total generada: $" + total.toFixed(2);
     }
+
+    
+    document.getElementById('tipoCliente').addEventListener('change', function() {
+    const tipo = this.value;
+    const bloqueCliente = document.querySelector('.bloque-cliente');
+    const bloqueCredenciales = document.querySelector('.bloque-credenciales');
+    const curpBusqueda = document.getElementById('curpBusqueda');
+
+    // Todos los inputs de cliente nuevo
+    const inputsCliente = bloqueCliente.querySelectorAll('input');
+    const inputsCredenciales = bloqueCredenciales.querySelectorAll('input');
+    const inputCurpBusqueda = curpBusqueda.querySelector('input');
+
+    if (tipo === 'existente') {
+      bloqueCliente.style.display = 'none';
+      bloqueCredenciales.style.display = 'none';
+      curpBusqueda.style.display = 'block';
+
+      // Desactivar required en cliente nuevo
+      inputsCliente.forEach(i => i.required = false);
+      inputsCredenciales.forEach(i => i.required = false);
+
+      // Activar required en CURP búsqueda
+      inputCurpBusqueda.required = true;
+
+    } else if (tipo === 'nuevo') {
+      bloqueCliente.style.display = 'block';
+      bloqueCredenciales.style.display = 'block';
+      curpBusqueda.style.display = 'none';
+
+      // Activar required en cliente nuevo
+      inputsCliente.forEach(i => i.required = true);
+      inputsCredenciales.forEach(i => i.required = true);
+
+      // Desactivar required en CURP búsqueda
+      inputCurpBusqueda.required = false;
+
+    } else {
+      // Selecciona... → ocultar todo y quitar required
+      bloqueCliente.style.display = 'none';
+      bloqueCredenciales.style.display = 'none';
+      curpBusqueda.style.display = 'none';
+
+      inputsCliente.forEach(i => i.required = false);
+      inputsCredenciales.forEach(i => i.required = false);
+      inputCurpBusqueda.required = false;
+    }
+  });
+
 
 
     //habilitar los inputs de crear poliza

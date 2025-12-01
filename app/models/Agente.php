@@ -19,7 +19,97 @@ class Agente {
         $stmt->execute([$idAgente]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+//crear
+    public function tieneSeguroVida($idCliente) {
+        $sql = "SELECT id_vida FROM seguro_vida WHERE id_cliente = :idCliente";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':idCliente' => $idCliente]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ? true : false;
+    }
 
+// Buscar cliente por CURP
+    public function buscarClientePorCurp($curp) {
+        $sql = "SELECT * FROM cliente WHERE curp = :curp";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':curp' => $curp]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // Crear cliente nuevo
+    public function crearCliente($datos) {
+        $sql = "INSERT INTO cliente (nombre, apellidoPaterno, apellidoMaterno, direccion, curp, rfc, telefono)
+                VALUES (:nombre, :apellidoPaterno, :apellidoMaterno, :direccion, :curp, :rfc, :telefono)";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($datos);
+        return $this->pdo->lastInsertId();
+    }
+
+    // Crear usuario para cliente nuevo
+    public function crearUsuarioCliente($datos) {
+        $sql = "INSERT INTO usuarios (usuario, contrasena, correo, rol, id_cliente)
+                VALUES (:usuario, :contrasena, :correo, 'cliente', :id_cliente)";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($datos);
+        return $this->pdo->lastInsertId();
+    }
+
+    // Validar si cliente ya está asignado a otro agente
+    public function validarAsignacionCliente($idCliente, $idAgente) {
+        $sql = "SELECT id_agente FROM solicitud WHERE id_cliente = :idCliente AND estatus = 'Activo'";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':idCliente' => $idCliente]);
+        $asignacion = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($asignacion && $asignacion['id_agente'] != $idAgente) {
+            return false; // asignado a otro agente
+        }
+        return true; // libre o mismo agente
+    }
+
+    // Crear seguro de vida
+    public function crearSeguroVida($datos) {
+        $sql = "INSERT INTO seguro_vida (id_cliente, edad, enfermedades_preexistentes, folio_vida, valor_asegurado, porcentaje_comision)
+                VALUES (:id_cliente, :edad, :enfermedades, :folio, :valor, :comision)";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($datos);
+        return $this->pdo->lastInsertId();
+    }
+
+    // Crear seguro de auto
+    public function crearSeguroAuto($datos) {
+        $sql = "INSERT INTO seguro_auto (id_cliente, matricula, modelo, anio, valor_factura, porcentaje_comision)
+                VALUES (:id_cliente, :matricula, :modelo, :anio, :valor, :comision)";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($datos);
+        return $this->pdo->lastInsertId();
+    }
+
+    // Crear seguro de robo
+    public function crearSeguroRobo($datos) {
+        $sql = "INSERT INTO seguro_robo (id_cliente, tipo_objeto, medidas_seguridad, valor_articulo, porcentaje_comision)
+                VALUES (:id_cliente, :objeto, :medidas, :valor, :comision)";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($datos);
+        return $this->pdo->lastInsertId();
+    }
+
+    // Crear seguro de incendio
+    public function crearSeguroIncendio($datos) {
+        $sql = "INSERT INTO seguro_incendio (id_cliente, valor_vivienda, antiguedad, nivel_incendio, causa_probable, tipo_construccion, porcentaje_comision)
+                VALUES (:id_cliente, :valor, :antiguedad, :nivel, :causa, :tipo, :comision)";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($datos);
+        return $this->pdo->lastInsertId();
+    }
+
+    // Crear solicitud
+    public function crearSolicitud($datos, $columnaSeguro) {
+        $sql = "INSERT INTO solicitud (id_cliente, id_agente, id_sucursal, fecha, estatus, $columnaSeguro)
+                VALUES (:id_cliente, :id_agente, :id_sucursal, :fecha, 'Activo', :idSeguro)";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($datos);
+        return $this->pdo->lastInsertId();
+    }
 
     public function listarClientesVidaActivos($idAgente) {
         $sql = "SELECT
@@ -72,7 +162,6 @@ class Agente {
         $stmt->execute([':idAgente' => $idAgente]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
     public function listarClientesRoboActivos($idAgente) {
         $sql = "SELECT
                     c.id_cliente,
@@ -164,6 +253,9 @@ class Agente {
         $stmt->execute([':idAgente' => $idAgente]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+
+
     //buscar
 
     public function listarClientesActivos($idAgente) {
